@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}My Profile — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">My Profile</div>
+    <div class="page-subtitle">Manage your account information</div>
+  </div>
+</div>
+
+<div class="grid-1-2 fade-in" style="align-items:start">
+
+  <!-- PROFILE CARD -->
+  <div class="card">
+    <div style="text-align:center;padding:20px 0">
+      <div id="profile-avatar" style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:2rem;margin:0 auto 16px">U</div>
+      <div style="font-size:1.2rem;font-weight:800" id="prof-name">—</div>
+      <div style="color:var(--text-muted);font-size:13px;margin-top:4px" id="prof-username">—</div>
+      <div style="margin-top:10px" id="prof-role-badge"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="info-row"><span class="label">Email</span><span class="value" id="prof-email">—</span></div>
+    <div class="info-row"><span class="label">Organization</span><span class="value" id="prof-org">—</span></div>
+    <div class="info-row"><span class="label">Phone</span><span class="value" id="prof-phone">—</span></div>
+    <div class="info-row"><span class="label">Member Since</span><span class="value" id="prof-joined">—</span></div>
+    <div class="info-row"><span class="label">Account Status</span><span class="value" id="prof-status">—</span></div>
+
+    <div id="vendor-info" style="display:none">
+      <hr class="divider">
+      <div class="card-title" style="margin-bottom:12px">Vendor Details</div>
+      <div class="info-row"><span class="label">Pickup Location</span><span class="value" id="prof-pickup">—</span></div>
+      <div class="info-row"><span class="label">Drop-off Location</span><span class="value" id="prof-dropoff">—</span></div>
+    </div>
+  </div>
+
+  <!-- EDIT FORM -->
+  <div class="card">
+    <div class="card-title">✏️ Edit Profile</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-control" id="edit-firstname">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="edit-lastname">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" id="edit-email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <input type="tel" class="form-control" id="edit-phone" placeholder="+254 700 000000">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Organization</label>
+      <input type="text" class="form-control" id="edit-org" placeholder="University or institution">
+    </div>
+
+    <div id="edit-vendor-fields" style="display:none">
+      <hr class="divider">
+      <div class="card-title" style="margin-bottom:12px;font-size:0.9rem">Vendor Settings</div>
+      <div class="form-group">
+        <label class="form-label">Default Pickup Location</label>
+        <input type="text" class="form-control" id="edit-pickup">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Default Drop-off Location</label>
+        <input type="text" class="form-control" id="edit-dropoff">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveProfile()">
+      Save Changes
+    </button>
+
+    <hr class="divider">
+    <div class="card-title" style="margin-bottom:12px">🔒 Change Password</div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input type="password" class="form-control" id="new-password" placeholder="Leave blank to keep current">
+    </div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="changePassword()">
+      Update Password
+    </button>
+
+    <hr class="divider">
+    <div style="text-align:center">
+      <button class="btn btn-danger btn-sm" data-action="logout">🚪 Sign Out</button>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth();
+  await loadProfile();
+});
+
+async function loadProfile() {
+  try {
+    const user = await API.users.profile();
+
+    const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '') || user.username?.[0]?.toUpperCase() || 'U';
+    document.getElementById('profile-avatar').textContent = initials;
+    document.getElementById('prof-name').textContent = user.first_name ? `${user.first_name} ${user.last_name}` : user.username;
+    document.getElementById('prof-username').textContent = `@${user.username}`;
+    document.getElementById('prof-email').textContent = user.email || '—';
+    document.getElementById('prof-org').textContent = user.organization || '—';
+    document.getElementById('prof-phone').textContent = user.phone || '—';
+    document.getElementById('prof-joined').textContent = fmtDate(user.date_joined);
+    document.getElementById('prof-status').innerHTML = user.is_active
+      ? '<span class="status-badge available">Active</span>'
+      : '<span class="status-badge pending">Inactive</span>';
+
+    const roleColors = { STUDENT: 'available', RESEARCHER: 'rented', VENDOR: 'maintenance', ADMIN: 'overdue' };
+    document.getElementById('prof-role-badge').innerHTML = `<span class="status-badge ${roleColors[user.role] || 'available'}">${user.role}</span>`;
+
+    // Prefill form
+    document.getElementById('edit-firstname').value = user.first_name || '';
+    document.getElementById('edit-lastname').value = user.last_name || '';
+    document.getElementById('edit-email').value = user.email || '';
+    document.getElementById('edit-phone').value = user.phone || '';
+    document.getElementById('edit-org').value = user.organization || '';
+
+    if (user.role === 'VENDOR') {
+      document.getElementById('vendor-info').style.display = 'block';
+      document.getElementById('edit-vendor-fields').style.display = 'block';
+      document.getElementById('prof-pickup').textContent = user.pickup_location || '—';
+      document.getElementById('prof-dropoff').textContent = user.dropoff_location || '—';
+      document.getElementById('edit-pickup').value = user.pickup_location || '';
+      document.getElementById('edit-dropoff').value = user.dropoff_location || '';
+    }
+
+  } catch (err) {
+    Toast.error('Could not load profile.');
+  }
+}
+
+async function saveProfile() {
+  const data = {
+    first_name: document.getElementById('edit-firstname').value.trim(),
+    last_name: document.getElementById('edit-lastname').value.trim(),
+    email: document.getElementById('edit-email').value.trim(),
+    phone: document.getElementById('edit-phone').value.trim(),
+    organization: document.getElementById('edit-org').value.trim(),
+  };
+
+  const user = API.getUser();
+  if (user?.role === 'VENDOR') {
+    data.pickup_location = document.getElementById('edit-pickup').value.trim();
+    data.dropoff_location = document.getElementById('edit-dropoff').value.trim();
+  }
+
+  try {
+    const updated = await API.users.updateProfile(data);
+    localStorage.setItem('slh_user', JSON.stringify({ ...user, ...updated }));
+    Toast.success('Profile updated!');
+    await loadProfile();
+    renderUserHeader();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Could not update profile.');
+  }
+}
+
+async function changePassword() {
+  const pwd = document.getElementById('new-password').value;
+  if (!pwd) { Toast.warning('Enter a new password.'); return; }
+  if (pwd.length < 8) { Toast.error('Password must be at least 8 characters.'); return; }
+
+  try {
+    await API.users.updateProfile({ password: pwd });
+    Toast.success('Password changed! Please sign in again.');
+    document.getElementById('new-password').value = '';
+    setTimeout(() => API.logout(), 2000);
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Could not change password.');
+  }
+}
+</script>
+{% endblock %}

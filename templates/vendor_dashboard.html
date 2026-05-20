@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Vendor Dashboard — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">Vendor Dashboard</div>
+    <div class="page-subtitle" id="vendor-subtitle">Manage your equipment and bookings</div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <a href="/vendor/equipment" class="btn btn-primary">+ Add Equipment</a>
+    <a href="/vendor/inventory" class="btn btn-ghost">📦 Inventory</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid fade-in stagger-1">
+  <div class="stat-card blue">
+    <div class="stat-icon">🔬</div>
+    <div class="stat-value" id="stat-listings">—</div>
+    <div class="stat-label">Equipment Listed</div>
+    <span class="stat-change up">↑ Active</span>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon">💰</div>
+    <div class="stat-value" id="stat-revenue">—</div>
+    <div class="stat-label">Total Revenue (KES)</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value" id="stat-bookings">—</div>
+    <div class="stat-label">Total Bookings</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-value" id="stat-incidents">—</div>
+    <div class="stat-label">Open Incidents</div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="grid-2-1" style="margin-bottom:24px">
+
+  <!-- RECENT BOOKINGS -->
+  <div class="card fade-in stagger-2">
+    <div class="card-title">📋 Recent Booking Requests
+      <a href="/vendor/bookings" style="margin-left:auto;font-size:12px;color:var(--primary)">View all →</a>
+    </div>
+    <div id="recent-bookings">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY STATUS -->
+  <div class="card fade-in stagger-3">
+    <div class="card-title">📦 Fleet Status</div>
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <svg id="fleet-donut" width="120" height="120" viewBox="0 0 120 120"></svg>
+    </div>
+    <div class="donut-legend" id="fleet-legend"></div>
+  </div>
+
+</div>
+
+<!-- REVENUE + EQUIPMENT -->
+<div class="grid-2" style="margin-bottom:24px">
+
+  <!-- REVENUE CHART -->
+  <div class="card fade-in stagger-1">
+    <div class="card-title">📈 Monthly Revenue (KES)</div>
+    <div id="revenue-chart" class="bar-chart" style="height:140px">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- TOP EQUIPMENT -->
+  <div class="card fade-in stagger-2">
+    <div class="card-title">🏆 Top Performing Equipment</div>
+    <div id="top-equipment">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PENDING CHECK-INS -->
+<div class="card fade-in stagger-3">
+  <div class="card-title">🔄 Pending Check-ins / Returns
+    <a href="/vendor/inventory" style="margin-left:auto;font-size:12px;color:var(--primary)">Manage Inventory →</a>
+  </div>
+  <div id="pending-checkins">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = requireAuth(['VENDOR']);
+  if (!user) return;
+
+  document.getElementById('vendor-subtitle').textContent = `Welcome back, ${user.first_name || user.username}`;
+
+  await Promise.all([loadVendorData()]);
+});
+
+async function loadVendorData() {
+  try {
+    const [equipment, bookings, incidents] = await Promise.all([
+      API.catalog.myEquipment(),
+      API.bookings.list(),
+      API.feedback.incidents(),
+    ]);
+
+    const equip = Array.isArray(equipment) ? equipment : (equipment.results || []);
+    const books = Array.isArray(bookings) ? bookings : (bookings.results || []);
+    const incs = Array.isArray(incidents) ? incidents : (incidents.results || []);
+
+    // Stats
+    document.getElementById('stat-listings').textContent = equip.length;
+    document.getElementById('stat-bookings').textContent = books.length;
+    document.getElementById('stat-incidents').textContent = incs.filter(i => !i.resolved).length;
+
+    // Revenue from completed bookings
+    const revenue = books
+      .filter(b => b.status === 'COMPLETED' && b.transaction?.amount)
+      .reduce((sum, b) => sum + parseFloat(b.transaction.amount), 0);
+    document.getElementById('stat-revenue').textContent = (revenue / 1000).toFixed(0) + 'K';
+
+    // Recent bookings
+    const recent = books.slice(0, 6);
+    if (recent.length === 0) {
+      document.getElementById('recent-bookings').innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No bookings yet</p></div>`;
+    } else {
+      document.getElementById('recent-bookings').innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Equipment</th><th>User</th><th>Dates</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              ${recent.map(b => `
+                <tr>
+                  <td><strong>${b.unit?.equipment?.name || '—'}</strong></td>
+                  <td style="color:var(--text-secondary)">${b.user?.username || '—'}</td>
+                  <td style="font-size:12px;color:var(--text-muted)">${fmtDate(b.start_date)} → ${fmtDate(b.end_date)}</td>
+                  <td style="color:var(--primary);font-weight:700">${b.transaction?.amount ? fmtKES(b.transaction.amount) : '—'}</td>
+                  <td>${statusBadge(b.status)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    // Fleet donut
+    let availCount = 0, rentedCount = 0, maintenanceCount = 0, damagedCount = 0;
+    try {
+      const inventory = await API.inventory.list();
+      const units = Array.isArray(inventory) ? inventory : [];
+      availCount = units.filter(u => u.status === 'AVAILABLE').length;
+      rentedCount = units.filter(u => u.status === 'RENTED').length;
+      maintenanceCount = units.filter(u => ['MAINTENANCE', 'CALIBRATION'].includes(u.status)).length;
+      damagedCount = units.filter(u => u.status === 'DAMAGED').length;
+      const total = units.length || 1;
+
+      drawDonut('fleet-donut', [
+        { color: 'var(--accent)', value: availCount },
+        { color: 'var(--primary)', value: rentedCount },
+        { color: 'var(--warning)', value: maintenanceCount },
+        { color: 'var(--danger)', value: damagedCount },
+      ], total);
+
+      document.getElementById('fleet-legend').innerHTML = [
+        { label: 'Available', color: 'var(--accent)', count: availCount },
+        { label: 'Rented', color: 'var(--primary)', count: rentedCount },
+        { label: 'Maintenance', color: 'var(--warning)', count: maintenanceCount },
+        { label: 'Damaged', color: 'var(--danger)', count: damagedCount },
+      ].map(item => `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${item.color}"></div>
+          <span style="color:var(--text-secondary)">${item.label}</span>
+          <span class="legend-value" style="color:${item.color}">${item.count}</span>
+        </div>
+      `).join('');
+
+      // Pending check-ins
+      const activeBookings = books.filter(b => b.status === 'ACTIVE');
+      if (activeBookings.length === 0) {
+        document.getElementById('pending-checkins').innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No pending check-ins</p></div>`;
+      } else {
+        document.getElementById('pending-checkins').innerHTML = `
+          <div class="table-wrap"><table>
+            <thead><tr><th>Equipment</th><th>User</th><th>Due Date</th><th>Drop-off</th><th>Actions</th></tr></thead>
+            <tbody>
+              ${activeBookings.map(b => `
+                <tr>
+                  <td><strong>${b.unit?.equipment?.name || '—'}</strong><br><span style="font-size:11px;color:var(--text-muted)">${b.unit?.serial_number || ''}</span></td>
+                  <td>${b.user?.username || '—'}</td>
+                  <td style="color:${new Date(b.end_date) < new Date() ? 'var(--danger)' : 'var(--text-primary)'};font-weight:600">${fmtDate(b.end_date)}</td>
+                  <td style="font-size:13px;color:var(--text-secondary)">${b.drop_off_location || '—'}</td>
+                  <td>
+                    <button class="btn btn-accent btn-sm" onclick="processCheckIn(${b.unit?.id}, ${b.id})">Check In</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table></div>`;
+      }
+    } catch {}
+
+    // Revenue bar chart (mock monthly distribution)
+    const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+    const monthRevenue = months.map((m, i) => ({
+      label: m,
+      value: Math.floor(revenue * (0.05 + Math.random() * 0.25)),
+      color: 'var(--primary)'
+    }));
+    drawBarChart('revenue-chart', monthRevenue);
+
+    // Top equipment
+    const equipWithBookings = equip.slice(0, 5).map(e => ({
+      ...e,
+      bookingCount: books.filter(b => b.unit?.equipment?.id === e.id || b.unit?.equipment === e.id).length
+    })).sort((a, b) => b.bookingCount - a.bookingCount);
+
+    document.getElementById('top-equipment').innerHTML = equipWithBookings.length === 0
+      ? `<div class="empty-state"><div class="empty-icon">🔬</div><p>No equipment listed yet</p><a href="/vendor/equipment" class="btn btn-primary btn-sm">Add Equipment</a></div>`
+      : equipWithBookings.map((e, i) => `
+          <div class="activity-item">
+            <div style="width:28px;height:28px;background:var(--primary-dim);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--primary)">${i+1}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:14px">${e.name}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${e.brand} · ${e.bookingCount} booking${e.bookingCount !== 1 ? 's' : ''}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700;color:var(--primary);font-size:14px">${fmtKES(e.rental_price_per_day)}/day</div>
+            </div>
+          </div>
+        `).join('');
+
+  } catch (err) {
+    console.error('Vendor dashboard error:', err);
+    Toast.error('Could not load dashboard data. Is the server running?');
+  }
+}
+
+async function processCheckIn(unitId, bookingId) {
+  const hasDamage = confirm('Does the returned equipment have any damage?');
+  let description = '';
+  if (hasDamage) {
+    description = prompt('Describe the damage:') || '';
+  }
+
+  try {
+    await API.inventory.checkIn(unitId, { has_damage: hasDamage, description });
+    Toast.success('Check-in processed successfully!');
+    await loadVendorData();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Check-in failed.');
+  }
+}
+</script>
+{% endblock %}

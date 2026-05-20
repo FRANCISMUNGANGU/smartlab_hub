@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}My Bookings — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">My Bookings</div>
+    <div class="page-subtitle">Track your equipment rentals and purchases</div>
+  </div>
+  <a href="/equipment" class="btn btn-primary">+ New Booking</a>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid fade-in stagger-1">
+  <div class="stat-card blue">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value" id="total-count">—</div>
+    <div class="stat-label">Total Bookings</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon">⚡</div>
+    <div class="stat-value" id="active-count">—</div>
+    <div class="stat-label">Currently Active</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-value" id="pending-count">—</div>
+    <div class="stat-label">Pending Payment</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-value" id="overdue-count">—</div>
+    <div class="stat-label">Overdue</div>
+  </div>
+</div>
+
+<!-- FILTER TABS -->
+<div class="tabs fade-in stagger-2" style="max-width:600px">
+  <button class="tab active" onclick="filterBy('ALL', this)">All</button>
+  <button class="tab" onclick="filterBy('PENDING', this)">Pending</button>
+  <button class="tab" onclick="filterBy('ACTIVE', this)">Active</button>
+  <button class="tab" onclick="filterBy('COMPLETED', this)">Completed</button>
+  <button class="tab" onclick="filterBy('CANCELLED', this)">Cancelled</button>
+</div>
+
+<!-- BOOKINGS TABLE -->
+<div class="card fade-in stagger-3">
+  <div id="bookings-content">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Booking Details</div>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allBookings = [];
+let currentFilter = 'ALL';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth();
+  await loadBookings();
+});
+
+async function loadBookings() {
+  try {
+    allBookings = await API.bookings.list();
+    
+    document.getElementById('total-count').textContent = allBookings.length;
+    document.getElementById('active-count').textContent = allBookings.filter(b => b.status === 'ACTIVE').length;
+    document.getElementById('pending-count').textContent = allBookings.filter(b => b.status === 'PENDING').length;
+    document.getElementById('overdue-count').textContent = allBookings.filter(b => b.status === 'OVERDUE').length;
+
+    renderBookings();
+  } catch (err) {
+    document.getElementById('bookings-content').innerHTML = `
+      <div class="empty-state"><div class="empty-icon">⚠️</div><h3>Could not load bookings</h3><p>${err.data?.detail || 'Please refresh the page'}</p></div>`;
+  }
+}
+
+function filterBy(status, btn) {
+  currentFilter = status;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderBookings();
+}
+
+function renderBookings() {
+  const items = currentFilter === 'ALL' ? allBookings : allBookings.filter(b => b.status === currentFilter);
+
+  if (items.length === 0) {
+    document.getElementById('bookings-content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No ${currentFilter === 'ALL' ? '' : currentFilter.toLowerCase()} bookings</h3>
+        <p>Your bookings will appear here</p>
+        <a href="/equipment" class="btn btn-primary btn-sm">Browse Equipment</a>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('bookings-content').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th>
+          <th>Equipment</th>
+          <th>Type</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${items.map((b, i) => `
+            <tr>
+              <td style="color:var(--text-muted);font-size:13px">#${b.id || (i+1)}</td>
+              <td>
+                <div style="font-weight:600">${b.unit?.equipment?.name || 'Equipment'}</div>
+                <div style="font-size:12px;color:var(--text-muted)">${b.unit?.serial_number || ''}</div>
+              </td>
+              <td><span class="status-badge ${b.booking_type === 'RENTAL' ? 'rented' : 'completed'}">${b.booking_type}</span></td>
+              <td style="font-size:13px">${fmtDate(b.start_date)}</td>
+              <td style="font-size:13px">${fmtDate(b.end_date)}</td>
+              <td style="font-weight:700;color:var(--primary)">${b.transaction?.amount ? fmtKES(b.transaction.amount) : '—'}</td>
+              <td>${statusBadge(b.status)}</td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-ghost btn-sm" onclick="viewDetail(${JSON.stringify(b).replace(/"/g, '&quot;')})">View</button>
+                  ${['PENDING','CONFIRMED'].includes(b.status) ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.id})">Cancel</button>` : ''}
+                  ${b.status === 'COMPLETED' ? `<button class="btn btn-ghost btn-sm" onclick="window.location='/feedback?unit=${b.unit?.id}'">Review</button>` : ''}
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function viewDetail(booking) {
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:24px;padding:16px;background:var(--bg-elevated);border-radius:10px">
+      <div style="width:56px;height:56px;background:var(--bg-card);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px">🔬</div>
+      <div>
+        <div style="font-weight:700;font-size:1.1rem">${booking.unit?.equipment?.name || 'Equipment'}</div>
+        <div style="color:var(--text-muted);font-size:13px">${booking.unit?.equipment?.brand || ''} · SN: ${booking.unit?.serial_number || '—'}</div>
+      </div>
+      <div style="margin-left:auto">${statusBadge(booking.status)}</div>
+    </div>
+
+    <div class="info-row"><span class="label">Booking Type</span><span class="value">${booking.booking_type}</span></div>
+    <div class="info-row"><span class="label">Start Date</span><span class="value">${fmtDate(booking.start_date)}</span></div>
+    <div class="info-row"><span class="label">End Date</span><span class="value">${fmtDate(booking.end_date)}</span></div>
+    <div class="info-row"><span class="label">Pickup Location</span><span class="value">${booking.pick_up_location || '—'}</span></div>
+    <div class="info-row"><span class="label">Drop-off Location</span><span class="value">${booking.drop_off_location || '—'}</span></div>
+    <div class="info-row"><span class="label">Amount</span><span class="value" style="color:var(--primary);font-weight:700">${booking.transaction?.amount ? fmtKES(booking.transaction.amount) : '—'}</span></div>
+    <div class="info-row"><span class="label">Payment Status</span><span class="value">${booking.transaction?.status ? statusBadge(booking.transaction.status) : '—'}</span></div>
+    <div class="info-row"><span class="label">Booked On</span><span class="value">${fmtDateTime(booking.created_at)}</span></div>
+
+    ${booking.status === 'COMPLETED' ? `
+      <hr class="divider">
+      <div style="text-align:center">
+        <p style="color:var(--text-secondary);margin-bottom:12px;font-size:14px">How was your experience with this equipment?</p>
+        <a href="/feedback?unit=${booking.unit?.id}" class="btn btn-accent">⭐ Leave a Review</a>
+      </div>
+    ` : ''}
+  `;
+  openModal('detail-modal');
+}
+
+async function cancelBooking(bookingId) {
+  if (!confirm('Are you sure you want to cancel this booking?')) return;
+  try {
+    await API.bookings.cancel(bookingId);
+    Toast.success('Booking cancelled.');
+    await loadBookings();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Could not cancel booking.');
+  }
+}
+</script>
+{% endblock %}

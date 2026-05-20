@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>{% block title %}SmartLab Hub{% endblock %}</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  {% block head_extra %}{% endblock %}
+
+  <style>
+    body{
+      font-family:'DM Sans', sans-serif;
+      background:#050816;
+      color:white;
+      overflow-x:hidden;
+    }
+
+    h1,h2,h3,h4,h5{
+      font-family:'Syne', sans-serif;
+    }
+
+    .glass{
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-scroll::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,.1);
+      border-radius:10px;
+    }
+
+    .gradient-text{
+      background:linear-gradient(to right,#38bdf8,#22c55e);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .active-link{
+      background:linear-gradient(to right, rgba(56,189,248,.15), rgba(34,197,94,.12));
+      border:1px solid rgba(56,189,248,.2);
+      color:white;
+    }
+  </style>
+</head>
+
+<body>
+
+{% block body %}
+
+<div class="flex min-h-screen bg-[#050816]">
+
+  <!-- SIDEBAR -->
+  <aside id="app-sidebar"
+         class="fixed lg:relative z-50 lg:z-0 top-0 left-0 h-screen w-80 bg-[#071120] border-r border-white/10 sidebar-scroll overflow-y-auto transition-all duration-300">
+
+    <!-- LOGO -->
+    <div class="h-24 px-8 flex items-center border-b border-white/10">
+
+      <a href="/" class="flex items-center gap-4">
+
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center text-2xl shadow-xl shadow-sky-500/20">
+          ⚗️
+        </div>
+
+        <div>
+          <h1 class="text-xl font-extrabold">SmartLab Hub</h1>
+          <p class="text-xs text-slate-400">
+            Scientific Equipment Platform
+          </p>
+        </div>
+
+      </a>
+
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="px-5 py-8 space-y-8">
+
+      {% block sidebar %}
+
+      <!-- STUDENT -->
+      {% block nav_student %}
+      <div id="nav-student">
+
+        <p class="text-xs uppercase tracking-[0.3em] text-slate-500 font-bold mb-4 px-4">
+          Main
+        </p>
+
+        <div class="space-y-2">
+
+          <a href="/dashboard"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl active-link transition">
+
+            <span class="text-xl">📊</span>
+            Dashboard
+          </a>
+
+          <a href="/equipment"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">🔬</span>
+            Equipment Catalog
+          </a>
+
+          <a href="/bookings"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">📅</span>
+            My Bookings
+          </a>
+
+          <a href="/feedback"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">⭐</span>
+            Reviews & Feedback
+          </a>
+
+        </div>
+
+      </div>
+      {% endblock %}
+
+      <!-- VENDOR -->
+      <div id="nav-vendor" style="display:none">
+
+        <p class="text-xs uppercase tracking-[0.3em] text-slate-500 font-bold mb-4 px-4">
+          Vendor Portal
+        </p>
+
+        <div class="space-y-2">
+
+          <a href="/vendor/dashboard"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">📊</span>
+            Vendor Dashboard
+          </a>
+
+          <a href="/vendor/equipment"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">🔧</span>
+            My Equipment
+          </a>
+
+          <a href="/vendor/bookings"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">📋</span>
+            Booking Requests
+          </a>
+
+          <a href="/vendor/inventory"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">📦</span>
+            Inventory
+          </a>
+
+        </div>
+
+      </div>
+
+      <!-- ADMIN -->
+      <div id="nav-admin" style="display:none">
+
+        <p class="text-xs uppercase tracking-[0.3em] text-slate-500 font-bold mb-4 px-4">
+          Administration
+        </p>
+
+        <div class="space-y-2">
+
+          <a href="/admin-dashboard"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">🏛️</span>
+            Admin Dashboard
+          </a>
+
+          <a href="/admin-dashboard#users"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">👥</span>
+            User Management
+          </a>
+
+          <a href="/admin-dashboard#incidents"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">⚠️</span>
+            Incidents
+          </a>
+
+          <a href="/admin-dashboard#analytics"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">📈</span>
+            Analytics
+          </a>
+
+        </div>
+
+      </div>
+
+      <!-- ACCOUNT -->
+      <div>
+
+        <p class="text-xs uppercase tracking-[0.3em] text-slate-500 font-bold mb-4 px-4">
+          Account
+        </p>
+
+        <div class="space-y-2">
+
+          <a href="/profile"
+             class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+            <span class="text-xl">👤</span>
+            Profile
+          </a>
+
+          <button data-action="logout"
+                  class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-red-500/10 text-red-400 transition">
+
+            <span class="text-xl">🚪</span>
+            Sign Out
+          </button>
+
+        </div>
+
+      </div>
+
+      {% endblock %}
+
+    </div>
+
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="flex-1 flex flex-col min-h-screen">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 h-24 bg-[#050816]/90 backdrop-blur-xl border-b border-white/10 px-6 lg:px-10">
+
+      <div class="h-full flex items-center justify-between gap-6">
+
+        <!-- LEFT -->
+        <div class="flex items-center gap-4 flex-1">
+
+          <button id="mobile-menu-btn"
+                  class="lg:hidden w-12 h-12 rounded-xl glass flex items-center justify-center text-xl">
+            ☰
+          </button>
+
+          <!-- SEARCH -->
+          <div class="hidden md:flex items-center gap-3 px-5 h-14 rounded-2xl glass w-full max-w-2xl">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-5 h-5 text-slate-400"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+
+            <input type="text"
+                   id="global-search"
+                   placeholder="Search equipment, bookings, vendors..."
+                   class="bg-transparent outline-none w-full text-white placeholder:text-slate-500"/>
+          </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-5">
+
+          <!-- NOTIFICATIONS -->
+          <div class="relative">
+
+            <button id="notif-btn"
+                    class="w-14 h-14 rounded-2xl glass flex items-center justify-center text-xl relative hover:bg-white/10 transition">
+
+              🔔
+
+              <span id="notif-count"
+                    class="absolute top-2 right-2 w-5 h-5 rounded-full bg-red-500 text-xs flex items-center justify-center">
+                3
+              </span>
+
+            </button>
+
+            <!-- DROPDOWN -->
+            <div id="notif-dropdown"
+                 class="hidden absolute right-0 mt-4 w-96 rounded-3xl glass overflow-hidden">
+
+              <div class="p-5 border-b border-white/10 flex items-center justify-between">
+                <h3 class="font-bold text-lg">Notifications</h3>
+
+                <button class="text-sky-400 text-sm">
+                  Mark all read
+                </button>
+              </div>
+
+              <div class="max-h-96 overflow-y-auto">
+
+                <div class="p-5 flex gap-4 hover:bg-white/5 transition cursor-pointer">
+
+                  <div class="w-12 h-12 rounded-2xl bg-sky-500/20 flex items-center justify-center">
+                    📋
+                  </div>
+
+                  <div>
+                    <h4 class="font-semibold">
+                      Booking Approved
+                    </h4>
+
+                    <p class="text-sm text-slate-400 mt-1">
+                      Your microscope booking has been approved.
+                    </p>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- USER -->
+          <div class="relative">
+
+            <button id="user-menu-btn"
+                    class="flex items-center gap-4 px-4 py-2 rounded-2xl glass hover:bg-white/10 transition">
+
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center font-bold text-lg">
+                <span id="user-avatar">U</span>
+              </div>
+
+              <div class="hidden md:block text-left">
+                <h4 class="font-semibold" id="user-name">
+                  Loading...
+                </h4>
+
+                <p class="text-sm text-slate-400" id="user-role">
+                  Researcher
+                </p>
+              </div>
+
+            </button>
+
+            <!-- USER DROPDOWN -->
+            <div id="user-dropdown"
+                 class="hidden absolute right-0 mt-4 w-72 rounded-3xl glass overflow-hidden">
+
+              <div class="p-6 border-b border-white/10">
+
+                <h3 class="font-bold text-lg" id="user-name-2">
+                  Loading...
+                </h3>
+
+                <p class="text-slate-400 text-sm mt-1" id="user-role-2">
+                  Researcher
+                </p>
+
+              </div>
+
+              <div class="p-3">
+
+                <a href="/profile"
+                   class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+                  👤 My Profile
+                </a>
+
+                <a href="/dashboard"
+                   class="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-white/5 transition">
+
+                  📊 Dashboard
+                </a>
+
+                <button data-action="logout"
+                        class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-red-500/10 text-red-400 transition">
+
+                  🚪 Sign Out
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-6 lg:p-10">
+
+      {% block content %}
+
+      <div class="glass rounded-[32px] p-10">
+
+        <h1 class="text-5xl font-extrabold mb-4">
+          Welcome To
+          <span class="gradient-text">
+            SmartLab Hub
+          </span>
+        </h1>
+
+        <p class="text-slate-400 text-lg">
+          Manage scientific equipment, rentals, bookings, analytics, and inventory in one intelligent platform.
+        </p>
+
+      </div>
+
+      {% endblock %}
+
+    </main>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+<script>
+  // Notifications dropdown
+  const notifBtn = document.getElementById('notif-btn');
+  const notifDropdown = document.getElementById('notif-dropdown');
+
+  notifBtn?.addEventListener('click', () => {
+    notifDropdown.classList.toggle('hidden');
+  });
+
+  // User dropdown
+  const userBtn = document.getElementById('user-menu-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+
+  userBtn?.addEventListener('click', () => {
+    userDropdown.classList.toggle('hidden');
+  });
+
+  // Mobile menu
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const sidebar = document.getElementById('app-sidebar');
+
+  mobileBtn?.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+
+  // Role based navigation
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const user = API.getUser();
+
+    if(user){
+
+      if(user.role === 'VENDOR'){
+        document.getElementById('nav-vendor').style.display = 'block';
+      }
+
+      if(user.role === 'ADMIN' || user.is_staff){
+        document.getElementById('nav-admin').style.display = 'block';
+      }
+
+      // USER DETAILS
+      const name = user.full_name || user.username || 'User';
+      const role = user.role || 'Researcher';
+
+      document.getElementById('user-name').textContent = name;
+      document.getElementById('user-role').textContent = role;
+
+      document.getElementById('user-name-2').textContent = name;
+      document.getElementById('user-role-2').textContent = role;
+
+      document.getElementById('user-avatar').textContent =
+        name.charAt(0).toUpperCase();
+    }
+
+  });
+</script>
+
+<script src="/static/js/smartlab.js"></script>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

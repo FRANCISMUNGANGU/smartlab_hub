@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">Admin Dashboard</div>
+    <div class="page-subtitle">Platform-wide analytics and management</div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-ghost" onclick="refreshData()">↻ Refresh</button>
+    <a href="/admin/" class="btn btn-primary">Django Admin →</a>
+  </div>
+</div>
+
+<!-- KPI STATS -->
+<div class="stats-grid fade-in stagger-1">
+  <div class="stat-card green">
+    <div class="stat-icon">💰</div>
+    <div class="stat-value" id="total-revenue">—</div>
+    <div class="stat-label">Total Revenue (KES)</div>
+    <span class="stat-change up">↑ All time</span>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-icon">🔬</div>
+    <div class="stat-value" id="fleet-total">—</div>
+    <div class="stat-label">Total Equipment Units</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">💪</div>
+    <div class="stat-value" id="fleet-health">—</div>
+    <div class="stat-label">Fleet Health %</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-value" id="open-incidents">—</div>
+    <div class="stat-label">Open Incidents</div>
+  </div>
+</div>
+
+<!-- SECOND ROW STATS -->
+<div class="stats-grid fade-in stagger-2" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card blue">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value" id="total-users">—</div>
+    <div class="stat-label">Registered Users</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value" id="total-bookings">—</div>
+    <div class="stat-label">Total Bookings</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">🏪</div>
+    <div class="stat-value" id="total-vendors">—</div>
+    <div class="stat-label">Active Vendors</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">🚨</div>
+    <div class="stat-value" id="vandalism-count">—</div>
+    <div class="stat-label">Vandalism Cases</div>
+  </div>
+</div>
+
+<!-- MAIN ANALYTICS GRID -->
+<div class="grid-2" style="margin-bottom:24px">
+
+  <!-- FLEET HEALTH DONUT -->
+  <div class="card fade-in stagger-1">
+    <div class="card-title">🔬 Fleet Health Overview</div>
+    <div class="donut-wrap">
+      <svg id="health-donut" width="120" height="120" viewBox="0 0 120 120"></svg>
+      <div class="donut-legend" id="health-legend"></div>
+    </div>
+    <hr class="divider">
+    <div id="health-bars"></div>
+  </div>
+
+  <!-- INCIDENTS BREAKDOWN -->
+  <div class="card fade-in stagger-2">
+    <div class="card-title">⚠️ Incidents by Type</div>
+    <div id="incidents-chart" class="bar-chart" style="height:130px"></div>
+    <hr class="divider">
+    <div id="incidents-summary" style="display:flex;gap:24px;flex-wrap:wrap"></div>
+  </div>
+
+</div>
+
+<!-- HIGH-RISK STUDENTS + PENDING VENDORS -->
+<div class="grid-2" style="margin-bottom:24px">
+
+  <div class="card fade-in stagger-1">
+    <div class="card-title">🚨 High-Risk Users
+      <span style="margin-left:auto;font-size:12px;font-weight:400;color:var(--text-muted)">Users with 2+ incidents</span>
+    </div>
+    <div id="risk-users">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <div class="card fade-in stagger-2">
+    <div class="card-title">🏪 Vendor Approvals
+      <span id="pending-vendor-badge" class="nav-badge" style="margin-left:8px;display:none">0</span>
+    </div>
+    <div id="pending-vendors">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- USER MANAGEMENT TABLE -->
+<div class="card fade-in stagger-3" id="users" style="margin-bottom:24px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+    <div class="card-title" style="margin-bottom:0">👥 User Management</div>
+    <div class="filters-bar" style="margin-bottom:0">
+      <button class="filter-chip active" onclick="filterUsers('', this)">All</button>
+      <button class="filter-chip" onclick="filterUsers('STUDENT', this)">Students</button>
+      <button class="filter-chip" onclick="filterUsers('RESEARCHER', this)">Researchers</button>
+      <button class="filter-chip" onclick="filterUsers('VENDOR', this)">Vendors</button>
+    </div>
+  </div>
+  <div id="users-table">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- INCIDENTS TABLE -->
+<div class="card fade-in stagger-1" id="incidents" style="margin-bottom:24px">
+  <div class="card-title">📋 All Incident Reports</div>
+  <div id="all-incidents-table">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ANALYTICS CHARTS -->
+<div class="grid-2" id="analytics">
+  <div class="card fade-in stagger-1">
+    <div class="card-title">📈 Bookings by Status</div>
+    <div id="bookings-donut-wrap" class="donut-wrap">
+      <svg id="bookings-donut" width="120" height="120" viewBox="0 0 120 120"></svg>
+      <div class="donut-legend" id="bookings-legend"></div>
+    </div>
+  </div>
+  <div class="card fade-in stagger-2">
+    <div class="card-title">💹 Revenue Trend</div>
+    <div id="revenue-trend-chart" class="bar-chart" style="height:140px">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allUsers = [];
+let allBookings = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = requireAuth();
+  if (!user) return;
+  if (!user.is_staff && user.role !== 'ADMIN') {
+    Toast.error('Admin access required.');
+    window.location.href = '/dashboard';
+    return;
+  }
+  await refreshData();
+});
+
+async function refreshData() {
+  await Promise.all([loadAnalytics(), loadUsers(), loadBookingsAnalytics(), loadIncidentsTable()]);
+}
+
+async function loadAnalytics() {
+  try {
+    const data = await API.analysis.dashboard();
+
+    document.getElementById('fleet-total').textContent = data.fleet_health?.total_units ?? '—';
+    document.getElementById('fleet-health').textContent = (data.fleet_health?.health_percentage ?? 0) + '%';
+    document.getElementById('total-revenue').textContent = data.finance?.total_revenue_kes
+      ? (parseFloat(data.finance.total_revenue_kes) / 1000).toFixed(0) + 'K'
+      : '0';
+    document.getElementById('open-incidents').textContent = data.pending_repairs ?? '—';
+    document.getElementById('vandalism-count').textContent = data.incidents?.vandalism_cases ?? '—';
+
+    // Fleet health donut
+    const total = data.fleet_health?.total_units || 1;
+    const damaged = data.fleet_health?.damaged_units || 0;
+    const healthy = total - damaged;
+
+    drawDonut('health-donut', [
+      { color: 'var(--accent)', value: healthy },
+      { color: 'var(--danger)', value: damaged },
+    ], total);
+
+    document.getElementById('health-legend').innerHTML = [
+      { label: 'Healthy Units', color: 'var(--accent)', count: healthy },
+      { label: 'Damaged Units', color: 'var(--danger)', count: damaged },
+    ].map(i => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${i.color}"></div>
+        <span style="color:var(--text-secondary)">${i.label}</span>
+        <span class="legend-value" style="color:${i.color}">${i.count}</span>
+      </div>
+    `).join('');
+
+    // Progress bars
+    document.getElementById('health-bars').innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+          <span style="color:var(--text-secondary)">Fleet Health</span>
+          <span style="color:var(--accent);font-weight:700">${data.fleet_health?.health_percentage ?? 0}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${data.fleet_health?.health_percentage ?? 0}%"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+          <span style="color:var(--text-secondary)">Damage Rate</span>
+          <span style="color:var(--danger);font-weight:700">${total > 0 ? ((damaged/total)*100).toFixed(1) : 0}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${total > 0 ? (damaged/total)*100 : 0}%;background:var(--danger)"></div></div>
+      </div>
+    `;
+
+    // Incidents chart
+    const incidentTypes = [
+      { label: 'Damage', value: data.incidents?.total_reports || 0, color: 'var(--danger)' },
+      { label: 'Vandalism', value: data.incidents?.vandalism_cases || 0, color: 'var(--warning)' },
+      { label: 'Open', value: data.pending_repairs || 0, color: 'var(--primary)' },
+    ];
+    drawBarChart('incidents-chart', incidentTypes);
+
+    document.getElementById('incidents-summary').innerHTML = [
+      { label: 'Total Reports', val: data.incidents?.total_reports || 0, color: 'var(--text-primary)' },
+      { label: 'Vandalism', val: data.incidents?.vandalism_cases || 0, color: 'var(--warning)' },
+      { label: 'Pending Repair', val: data.pending_repairs || 0, color: 'var(--danger)' },
+    ].map(i => `
+      <div>
+        <div style="font-family:var(--font-display);font-weight:800;font-size:1.5rem;color:${i.color}">${i.val}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${i.label}</div>
+      </div>
+    `).join('');
+
+    // High risk students
+    const riskStudents = data.incidents?.high_risk_students || [];
+    if (riskStudents.length === 0) {
+      document.getElementById('risk-users').innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No high-risk users detected</p></div>`;
+    } else {
+      document.getElementById('risk-users').innerHTML = riskStudents.map(s => `
+        <div class="activity-item" style="align-items:center">
+          <div class="activity-dot red"></div>
+          <div style="flex:1">
+            <div style="font-weight:600">${s.target_user__username}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${s.report_count} incident reports</div>
+          </div>
+          <div class="progress-bar" style="width:80px">
+            <div class="progress-fill" style="width:${Math.min(100, s.report_count * 20)}%;background:var(--danger)"></div>
+          </div>
+          <span style="font-weight:700;color:var(--danger);font-size:14px;min-width:20px;text-align:right">${s.report_count}</span>
+        </div>
+      `).join('');
+    }
+
+  } catch (err) {
+    console.error('Analytics error:', err);
+    Toast.error('Could not load analytics. Make sure you are logged in as admin.');
+  }
+}
+
+async function loadUsers() {
+  try {
+    const data = await API.users.list();
+    allUsers = Array.isArray(data) ? data : (data.results || []);
+
+    document.getElementById('total-users').textContent = allUsers.length;
+    document.getElementById('total-vendors').textContent = allUsers.filter(u => u.role === 'VENDOR').length;
+
+    // Pending vendors
+    const pendingVendors = allUsers.filter(u => u.role === 'VENDOR' && !u.is_active);
+    if (pendingVendors.length > 0) {
+      document.getElementById('pending-vendor-badge').textContent = pendingVendors.length;
+      document.getElementById('pending-vendor-badge').style.display = 'inline';
+    }
+
+    renderPendingVendors(pendingVendors);
+    renderUsersTable(allUsers);
+  } catch (err) {
+    document.getElementById('users-table').innerHTML = `<div class="empty-state"><p>Could not load users</p></div>`;
+  }
+}
+
+function renderPendingVendors(vendors) {
+  if (vendors.length === 0) {
+    document.getElementById('pending-vendors').innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No pending vendor approvals</p></div>`;
+    return;
+  }
+  document.getElementById('pending-vendors').innerHTML = vendors.map(v => `
+    <div class="activity-item" style="align-items:center">
+      <div class="user-avatar" style="width:36px;height:36px;font-size:13px;border-radius:50%;background:linear-gradient(135deg,var(--warning),var(--primary))">
+        ${(v.first_name?.[0] || v.username?.[0] || 'V').toUpperCase()}
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:600">${v.first_name ? `${v.first_name} ${v.last_name}` : v.username}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${v.organization || v.email}</div>
+      </div>
+      <button class="btn btn-accent btn-sm" onclick="approveVendor(${v.id}, this)">Approve</button>
+    </div>
+  `).join('');
+}
+
+async function approveVendor(userId, btn) {
+  btn.textContent = '…'; btn.disabled = true;
+  try {
+    await API.users.approveVendor(userId);
+    Toast.success('Vendor approved!');
+    await loadUsers();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Approval failed.');
+    btn.textContent = 'Approve'; btn.disabled = false;
+  }
+}
+
+function filterUsers(role, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = role ? allUsers.filter(u => u.role === role) : allUsers;
+  renderUsersTable(filtered);
+}
+
+function renderUsersTable(users) {
+  if (users.length === 0) {
+    document.getElementById('users-table').innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>No users found</p></div>`;
+    return;
+  }
+  document.getElementById('users-table').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>User</th><th>Role</th><th>Organization</th><th>Email</th><th>Status</th><th>Joined</th>
+        </tr></thead>
+        <tbody>
+          ${users.map(u => `
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">
+                    ${(u.first_name?.[0] || u.username?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <div>
+                    <div style="font-weight:600">${u.first_name ? `${u.first_name} ${u.last_name}` : u.username}</div>
+                    <div style="font-size:12px;color:var(--text-muted)">@${u.username}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-badge ${u.role === 'ADMIN' ? 'overdue' : u.role === 'VENDOR' ? 'rented' : 'available'}">${u.role}</span></td>
+              <td style="color:var(--text-secondary)">${u.organization || '—'}</td>
+              <td style="font-size:13px">${u.email || '—'}</td>
+              <td>${u.is_active ? '<span class="status-badge available">Active</span>' : '<span class="status-badge pending">Inactive</span>'}</td>
+              <td style="font-size:12px;color:var(--text-muted)">${fmtDate(u.date_joined)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function loadBookingsAnalytics() {
+  try {
+    const data = await API.bookings.list();
+    allBookings = Array.isArray(data) ? data : (data.results || []);
+    document.getElementById('total-bookings').textContent = allBookings.length;
+
+    // Bookings by status donut
+    const statuses = ['PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED', 'OVERDUE'];
+    const colors = ['var(--warning)', 'var(--accent)', 'var(--primary)', '#63b3ed', 'var(--text-muted)', 'var(--danger)'];
+    const counts = statuses.map(s => allBookings.filter(b => b.status === s).length);
+    const total = allBookings.length || 1;
+
+    drawDonut('bookings-donut', statuses.map((s, i) => ({ color: colors[i], value: counts[i] })), total);
+    document.getElementById('bookings-legend').innerHTML = statuses.map((s, i) => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${colors[i]}"></div>
+        <span style="color:var(--text-secondary);font-size:13px">${s}</span>
+        <span class="legend-value" style="color:${colors[i]}">${counts[i]}</span>
+      </div>
+    `).join('');
+
+    // Revenue trend (by month)
+    const months = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+    const revByMonth = months.map(m => ({
+      label: m,
+      value: allBookings.filter(b => {
+        if (!b.created_at) return false;
+        return new Date(b.created_at).toLocaleString('default', { month: 'short' }) === m;
+      }).filter(b => b.transaction?.amount).reduce((s, b) => s + parseFloat(b.transaction?.amount || 0), 0),
+      color: 'var(--accent)'
+    }));
+    drawBarChart('revenue-trend-chart', revByMonth);
+
+  } catch {}
+}
+
+async function loadIncidentsTable() {
+  try {
+    const data = await API.feedback.incidents();
+    const incidents = Array.isArray(data) ? data : (data.results || []);
+
+    if (incidents.length === 0) {
+      document.getElementById('all-incidents-table').innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No incidents reported</p></div>`;
+      return;
+    }
+
+    document.getElementById('all-incidents-table').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Type</th><th>Equipment</th><th>Reporter</th><th>Target User</th><th>Description</th><th>Resolved</th><th>Date</th>
+          </tr></thead>
+          <tbody>
+            ${incidents.map(i => `
+              <tr>
+                <td><span class="status-badge ${['VANDALISM','DAMAGE'].includes(i.incident_type) ? 'damaged' : 'maintenance'}">${i.incident_type?.replace(/_/g,' ')}</span></td>
+                <td>${i.equipment_unit?.equipment?.name || '—'}<br><span style="font-size:11px;color:var(--text-muted)">${i.equipment_unit?.serial_number || ''}</span></td>
+                <td>${i.reporter?.username || '—'}</td>
+                <td style="color:${i.target_user ? 'var(--warning)' : 'var(--text-muted)'};font-weight:${i.target_user ? '600' : '400'}">${i.target_user?.username || '—'}</td>
+                <td style="font-size:13px;color:var(--text-secondary);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i.description}</td>
+                <td>${i.resolved ? '<span class="status-badge available">Resolved</span>' : '<span class="status-badge pending">Open</span>'}</td>
+                <td style="font-size:12px;color:var(--text-muted)">${fmtDate(i.reported_at)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch {}
+}
+</script>
+{% endblock %}

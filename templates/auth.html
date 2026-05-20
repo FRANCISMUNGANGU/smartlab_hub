@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title id="page-title">
+    Sign In — SmartLab Hub
+  </title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      font-family:'DM Sans', sans-serif;
+      background:
+      radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 25%),
+      radial-gradient(circle at bottom right, rgba(34,197,94,.12), transparent 25%),
+      #050816;
+      color:white;
+      overflow-x:hidden;
+    }
+
+    h1,h2,h3,h4{
+      font-family:'Syne', sans-serif;
+    }
+
+    .glass{
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .gradient-text{
+      background:linear-gradient(to right,#38bdf8,#22c55e);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .tab-active{
+      background:linear-gradient(to right,#0ea5e9,#22c55e);
+      color:white;
+      box-shadow:0 10px 30px rgba(14,165,233,.25);
+    }
+
+    .floating{
+      animation:float 5s ease-in-out infinite;
+    }
+
+    @keyframes float{
+      0%,100%{
+        transform:translateY(0px);
+      }
+      50%{
+        transform:translateY(-10px);
+      }
+    }
+
+    .role-card{
+      transition:all .3s ease;
+    }
+
+    .role-card:hover{
+      transform:translateY(-5px);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6">
+
+<!-- BACKGROUND -->
+<div class="absolute top-0 left-0 w-96 h-96 bg-sky-500/20 blur-3xl rounded-full"></div>
+<div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/20 blur-3xl rounded-full"></div>
+
+<div class="relative z-10 w-full max-w-7xl grid lg:grid-cols-2 gap-14 items-center">
+
+  <!-- LEFT SIDE -->
+  <div class="hidden lg:block">
+
+    <div class="mb-8 flex items-center gap-4">
+
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center text-3xl shadow-2xl shadow-sky-500/30">
+        ⚗️
+      </div>
+
+      <div>
+        <h1 class="text-3xl font-extrabold">
+          SmartLab Hub
+        </h1>
+
+        <p class="text-slate-400">
+          Scientific Equipment Platform
+        </p>
+      </div>
+
+    </div>
+
+    <h2 class="text-6xl font-extrabold leading-tight mb-8">
+      Modern
+      <span class="gradient-text">
+        Laboratory
+      </span>
+      Management Platform
+    </h2>
+
+    <p class="text-slate-300 text-lg leading-relaxed max-w-xl mb-10">
+      Manage scientific equipment rentals, bookings, researchers,
+      analytics, and laboratory operations from one intelligent system.
+    </p>
+
+    <!-- FEATURES -->
+    <div class="space-y-5">
+
+      <div class="glass rounded-2xl p-5 flex items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-sky-500/20 flex items-center justify-center text-2xl">
+          🔬
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg">
+            Equipment Rentals
+          </h3>
+
+          <p class="text-slate-400 text-sm">
+            Reserve and manage scientific equipment seamlessly.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5 flex items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-2xl">
+          📈
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg">
+            Smart Analytics
+          </h3>
+
+          <p class="text-slate-400 text-sm">
+            Track usage, bookings, incidents, and revenue insights.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5 flex items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-orange-500/20 flex items-center justify-center text-2xl">
+          ⚡
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg">
+            Real-Time Inventory
+          </h3>
+
+          <p class="text-slate-400 text-sm">
+            Monitor inventory availability and equipment status live.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- AUTH CARD -->
+  <div class="w-full max-w-xl mx-auto">
+
+    <div class="glass rounded-[36px] p-8 md:p-10 shadow-2xl">
+
+      <!-- MOBILE LOGO -->
+      <div class="lg:hidden flex items-center justify-center gap-4 mb-10">
+
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center text-2xl">
+          ⚗️
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-extrabold">
+            SmartLab Hub
+          </h2>
+
+          <p class="text-slate-400 text-sm">
+            Scientific Equipment Platform
+          </p>
+        </div>
+
+      </div>
+
+      <!-- TABS -->
+      <div class="grid grid-cols-2 gap-3 mb-10 bg-white/5 p-2 rounded-2xl">
+
+        <button id="login-tab"
+                onclick="switchTab('login')"
+                class="tab-active py-3 rounded-xl font-semibold transition">
+          Sign In
+        </button>
+
+        <button id="register-tab"
+                onclick="switchTab('register')"
+                class="py-3 rounded-xl font-semibold text-slate-400 hover:text-white transition">
+          Create Account
+        </button>
+
+      </div>
+
+      <!-- LOGIN -->
+      <div id="form-login">
+
+        <div id="login-err"
+             class="hidden mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400 px-5 py-4 text-sm">
+        </div>
+
+        <div class="space-y-6">
+
+          <div>
+            <label class="block mb-3 text-sm font-medium text-slate-300">
+              Username
+            </label>
+
+            <div class="relative">
+
+              <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500">
+                👤
+              </span>
+
+              <input type="text"
+                     id="login-username"
+                     placeholder="your_username"
+                     class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 pl-14 pr-5 outline-none focus:border-sky-500 transition">
+
+            </div>
+
+          </div>
+
+          <div>
+            <label class="block mb-3 text-sm font-medium text-slate-300">
+              Password
+            </label>
+
+            <div class="relative">
+
+              <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500">
+                🔒
+              </span>
+
+              <input type="password"
+                     id="login-password"
+                     placeholder="••••••••"
+                     class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 pl-14 pr-14 outline-none focus:border-sky-500 transition">
+
+              <button type="button"
+                      onclick="togglePwd('login-password')"
+                      class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition">
+                👁
+              </button>
+
+            </div>
+
+          </div>
+
+          <button id="login-btn"
+                  onclick="doLogin()"
+                  class="w-full h-14 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 font-semibold text-lg shadow-xl shadow-sky-500/20 hover:scale-[1.02] transition">
+            Sign In →
+          </button>
+
+        </div>
+
+        <div class="mt-8 text-center text-slate-400 text-sm">
+
+          Don’t have an account?
+
+          <button onclick="switchTab('register')"
+                  class="text-sky-400 hover:text-sky-300 transition">
+            Create one
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- REGISTER -->
+      <div id="form-register" class="hidden">
+
+        <div id="register-err"
+             class="hidden mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400 px-5 py-4 text-sm">
+        </div>
+
+        <!-- ROLE SELECTION -->
+        <div class="mb-8">
+
+          <div class="flex items-center justify-between mb-4">
+            <label class="text-sm font-medium text-slate-300">
+              Select Your Role
+            </label>
+
+            <div id="selected-role-label"
+                 class="text-xs px-4 py-2 rounded-full bg-sky-500/20 border border-sky-500/30 text-sky-300 font-semibold tracking-wide">
+              🎓 Student Selected
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+
+            <!-- STUDENT -->
+            <div class="role-option role-card relative rounded-2xl border border-sky-400/50 bg-sky-500/10 p-5 text-center cursor-pointer"
+                 data-role="STUDENT"
+                 onclick="selectRole(this)">
+
+              <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-sky-500 flex items-center justify-center text-xs font-bold role-check">
+                ✓
+              </div>
+
+              <div class="text-4xl mb-3">
+                🎓
+              </div>
+
+              <div class="text-sm font-bold text-white">
+                Student
+              </div>
+
+              <div class="text-xs text-slate-400 mt-2">
+                Book equipment
+              </div>
+
+            </div>
+
+            <!-- RESEARCHER -->
+            <div class="role-option role-card relative rounded-2xl border border-white/10 bg-white/5 p-5 text-center cursor-pointer"
+                 data-role="RESEARCHER"
+                 onclick="selectRole(this)">
+
+              <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500 hidden items-center justify-center text-xs font-bold role-check">
+                ✓
+              </div>
+
+              <div class="text-4xl mb-3">
+                🔬
+              </div>
+
+              <div class="text-sm font-bold text-white">
+                Researcher
+              </div>
+
+              <div class="text-xs text-slate-400 mt-2">
+                Advanced access
+              </div>
+
+            </div>
+
+            <!-- VENDOR -->
+            <div class="role-option role-card relative rounded-2xl border border-white/10 bg-white/5 p-5 text-center cursor-pointer"
+                 data-role="VENDOR"
+                 onclick="selectRole(this)">
+
+              <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-orange-500 hidden items-center justify-center text-xs font-bold role-check">
+                ✓
+              </div>
+
+              <div class="text-4xl mb-3">
+                🏪
+              </div>
+
+              <div class="text-sm font-bold text-white">
+                Vendor
+              </div>
+
+              <div class="text-xs text-slate-400 mt-2">
+                Manage equipment
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="space-y-5">
+
+          <div class="grid md:grid-cols-2 gap-5">
+
+            <input type="text"
+                   id="reg-firstname"
+                   placeholder="First Name"
+                   class="h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+            <input type="text"
+                   id="reg-lastname"
+                   placeholder="Last Name"
+                   class="h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+          </div>
+
+          <input type="text"
+                 id="reg-username"
+                 placeholder="Username"
+                 class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+          <input type="email"
+                 id="reg-email"
+                 placeholder="Email Address"
+                 class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+          <input type="text"
+                 id="reg-org"
+                 placeholder="Organization / Institution"
+                 class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+          <div class="relative">
+
+            <input type="password"
+                   id="reg-password"
+                   placeholder="Password"
+                   class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 pr-14 outline-none focus:border-sky-500 transition">
+
+            <button type="button"
+                    onclick="togglePwd('reg-password')"
+                    class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition">
+              👁
+            </button>
+
+          </div>
+
+          <!-- VENDOR EXTRA -->
+          <div id="vendor-extra" class="hidden space-y-5">
+
+            <div class="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-sm text-yellow-300">
+              ⚠ Vendor accounts require admin approval before listing equipment.
+            </div>
+
+            <input type="text"
+                   id="reg-pickup"
+                   placeholder="Default Pickup Location"
+                   class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+            <input type="text"
+                   id="reg-dropoff"
+                   placeholder="Default Drop-off Location"
+                   class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-5 outline-none focus:border-sky-500 transition">
+
+          </div>
+
+          <button id="register-btn"
+                  onclick="doRegister()"
+                  class="w-full h-14 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 font-semibold text-lg shadow-xl shadow-sky-500/20 hover:scale-[1.02] transition">
+            Create Account →
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="/static/js/smartlab.js"></script>
+
+<script>
+
+  // ROLE SELECTION
+  let selectedRole = 'STUDENT';
+
+  function selectRole(el){
+
+    document.querySelectorAll('.role-option').forEach(role => {
+
+      role.classList.remove(
+        'border-sky-400/50',
+        'bg-sky-500/10',
+        'border-emerald-400/50',
+        'bg-emerald-500/10',
+        'border-orange-400/50',
+        'bg-orange-500/10'
+      );
+
+      role.classList.add(
+        'border-white/10',
+        'bg-white/5'
+      );
+
+      const check = role.querySelector('.role-check');
+
+      if(check){
+        check.classList.add('hidden');
+        check.classList.remove('flex');
+      }
+
+    });
+
+    selectedRole = el.dataset.role;
+
+    if(selectedRole === 'STUDENT'){
+      el.classList.add('border-sky-400/50','bg-sky-500/10');
+    }
+
+    if(selectedRole === 'RESEARCHER'){
+      el.classList.add('border-emerald-400/50','bg-emerald-500/10');
+    }
+
+    if(selectedRole === 'VENDOR'){
+      el.classList.add('border-orange-400/50','bg-orange-500/10');
+    }
+
+    const activeCheck = el.querySelector('.role-check');
+
+    if(activeCheck){
+      activeCheck.classList.remove('hidden');
+      activeCheck.classList.add('flex');
+    }
+
+    const label = document.getElementById('selected-role-label');
+
+    if(selectedRole === 'STUDENT'){
+      label.innerHTML = '🎓 Student Selected';
+      label.className =
+        'text-xs px-4 py-2 rounded-full bg-sky-500/20 border border-sky-500/30 text-sky-300 font-semibold tracking-wide';
+    }
+
+    if(selectedRole === 'RESEARCHER'){
+      label.innerHTML = '🔬 Researcher Selected';
+      label.className =
+        'text-xs px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-semibold tracking-wide';
+    }
+
+    if(selectedRole === 'VENDOR'){
+      label.innerHTML = '🏪 Vendor Selected';
+      label.className =
+        'text-xs px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-300 font-semibold tracking-wide';
+    }
+
+    document.getElementById('vendor-extra')
+      .classList.toggle(
+        'hidden',
+        selectedRole !== 'VENDOR'
+      );
+  }
+
+  // SWITCH TABS
+  function switchTab(tab){
+
+    const loginForm = document.getElementById('form-login');
+    const registerForm = document.getElementById('form-register');
+
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+
+    if(tab === 'login'){
+
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+
+      loginTab.classList.add('tab-active');
+      registerTab.classList.remove('tab-active');
+
+    }else{
+
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+
+      registerTab.classList.add('tab-active');
+      loginTab.classList.remove('tab-active');
+    }
+  }
+
+  // PASSWORD TOGGLE
+  function togglePwd(id){
+
+    const input = document.getElementById(id);
+
+    input.type =
+      input.type === 'password'
+      ? 'text'
+      : 'password';
+  }
+
+</script>
+
+</body>
+</html>

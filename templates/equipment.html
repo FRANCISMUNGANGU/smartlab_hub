@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block title %}Equipment Catalog — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">Equipment Catalog</div>
+    <div class="page-subtitle">Browse and book scientific equipment</div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="card fade-in" style="margin-bottom:24px;padding:18px 24px">
+  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <div class="header-search" style="flex:1;min-width:200px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Search equipment, brand, model…" oninput="filterEquipment()">
+    </div>
+
+    <select class="form-control" id="filter-category" onchange="filterEquipment()" style="width:auto;min-width:160px">
+      <option value="">All Categories</option>
+    </select>
+
+    <select class="form-control" id="filter-sort" onchange="filterEquipment()" style="width:auto;min-width:160px">
+      <option value="">Sort: Default</option>
+      <option value="price_asc">Price: Low to High</option>
+      <option value="price_desc">Price: High to Low</option>
+      <option value="name">Name A–Z</option>
+    </select>
+
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" id="view-grid" onclick="setView('grid')" title="Grid view">⊞</button>
+      <button class="btn btn-ghost btn-sm" id="view-list" onclick="setView('list')" title="List view">☰</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER CHIPS -->
+<div class="filters-bar fade-in">
+  <button class="filter-chip active" data-avail="" onclick="filterByAvail(this, '')">All Equipment</button>
+  <button class="filter-chip" data-avail="available" onclick="filterByAvail(this, 'available')">Available Now</button>
+  <button class="filter-chip" data-avail="rental" onclick="filterByAvail(this, 'rental')">Rental Only</button>
+  <button class="filter-chip" data-avail="purchase" onclick="filterByAvail(this, 'purchase')">For Purchase</button>
+  <span id="result-count" style="margin-left:auto;font-size:13px;color:var(--text-muted)">Loading…</span>
+</div>
+
+<!-- EQUIPMENT GRID -->
+<div id="equipment-container" class="equipment-grid fade-in">
+  <div style="grid-column:1/-1;padding:60px 0;text-align:center">
+    <div class="spinner" style="margin:0 auto"></div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-equipment-name">Book Equipment</div>
+      <button class="modal-close" onclick="closeModal('booking-modal')">✕</button>
+    </div>
+
+    <div id="modal-body">
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:24px">
+        <div style="width:80px;height:80px;background:var(--bg-elevated);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0">🔬</div>
+        <div>
+          <div id="modal-brand" style="font-size:13px;color:var(--text-muted);margin-bottom:4px"></div>
+          <div id="modal-desc" style="font-size:14px;color:var(--text-secondary);line-height:1.6"></div>
+        </div>
+      </div>
+
+      <div class="tabs" id="booking-type-tabs">
+        <button class="tab active" onclick="setBookingType('RENTAL', this)">📅 Rental</button>
+        <button class="tab" onclick="setBookingType('PURCHASE', this)" id="purchase-tab">🛒 Purchase</button>
+      </div>
+
+      <div id="rental-fields">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="modal-start-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" id="modal-end-date" oninput="calcPrice()">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Pick-up Location</label>
+          <input type="text" class="form-control" id="modal-pickup" placeholder="Your pickup point">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Drop-off Location</label>
+          <input type="text" class="form-control" id="modal-dropoff" placeholder="Return location">
+        </div>
+      </div>
+
+      <div id="price-summary" style="background:var(--bg-elevated);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:none">
+        <div class="info-row"><span class="label">Unit</span><span class="value" id="ps-unit">—</span></div>
+        <div class="info-row"><span class="label">Duration</span><span class="value" id="ps-days">—</span></div>
+        <div class="info-row"><span class="label">Rate</span><span class="value" id="ps-rate">—</span></div>
+        <div class="info-row" style="border-top:2px solid var(--border);margin-top:8px;padding-top:8px">
+          <span class="label" style="font-weight:700">Total</span>
+          <span class="value" style="color:var(--primary);font-size:1.1rem" id="ps-total">—</span>
+        </div>
+      </div>
+
+      <div id="unit-select-wrap" class="form-group">
+        <label class="form-label">Select Unit (Serial Number)</label>
+        <select class="form-control" id="unit-select">
+          <option value="">Loading units…</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="submitBooking()">
+        💳 Proceed to Payment
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allEquipment = [];
+let selectedEquipment = null;
+let bookingType = 'RENTAL';
+let availFilter = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth();
+
+  // Set min date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-start-date').min = today;
+  document.getElementById('modal-end-date').min = today;
+  document.getElementById('modal-start-date').value = today;
+
+  await loadEquipment();
+  await loadCategories();
+});
+
+async function loadEquipment() {
+  try {
+    const data = await API.catalog.list();
+    allEquipment = Array.isArray(data) ? data : (data.results || []);
+    renderEquipment(allEquipment);
+  } catch (err) {
+    document.getElementById('equipment-container').innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Failed to load equipment</h3><p>${err.data?.detail || 'Please try again'}</p></div></div>`;
+  }
+}
+
+async function loadCategories() {
+  try {
+    // Try to extract categories from equipment
+    const cats = [...new Set(allEquipment.map(e => e.category?.name).filter(Boolean))];
+    const sel = document.getElementById('filter-category');
+    cats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
+
+let currentView = 'grid';
+
+function setView(view) {
+  currentView = view;
+  const container = document.getElementById('equipment-container');
+  if (view === 'list') {
+    container.style.gridTemplateColumns = '1fr';
+  } else {
+    container.style.gridTemplateColumns = '';
+    container.className = 'equipment-grid fade-in';
+  }
+  document.getElementById('view-grid').classList.toggle('active', view === 'grid');
+  document.getElementById('view-list').classList.toggle('active', view === 'list');
+  renderEquipment(getFiltered());
+}
+
+function filterByAvail(el, val) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  availFilter = val;
+  filterEquipment();
+}
+
+function getFiltered() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const cat = document.getElementById('filter-category').value;
+  const sort = document.getElementById('filter-sort').value;
+
+  let items = allEquipment.filter(e => {
+    const matchSearch = !search || e.name.toLowerCase().includes(search) || e.brand?.toLowerCase().includes(search) || e.model_number?.toLowerCase().includes(search);
+    const matchCat = !cat || e.category?.name === cat;
+    const matchAvail = !availFilter || availFilter === 'available' || availFilter === 'rental' || availFilter === 'purchase';
+    return matchSearch && matchCat && matchAvail;
+  });
+
+  if (sort === 'price_asc') items.sort((a, b) => a.rental_price_per_day - b.rental_price_per_day);
+  else if (sort === 'price_desc') items.sort((a, b) => b.rental_price_per_day - a.rental_price_per_day);
+  else if (sort === 'name') items.sort((a, b) => a.name.localeCompare(b.name));
+
+  return items;
+}
+
+function filterEquipment() {
+  renderEquipment(getFiltered());
+}
+
+function renderEquipment(items) {
+  document.getElementById('result-count').textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+  if (items.length === 0) {
+    document.getElementById('equipment-container').innerHTML = `
+      <div style="grid-column:1/-1">
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>No equipment found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (currentView === 'list') {
+    document.getElementById('equipment-container').innerHTML = `
+      <div style="grid-column:1/-1" class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Equipment</th><th>Category</th><th>Brand</th><th>Model</th>
+            <th>Rental/Day</th><th>Purchase</th><th>Action</th>
+          </tr></thead>
+          <tbody>
+            ${items.map(e => `
+              <tr>
+                <td><strong>${e.name}</strong></td>
+                <td style="color:var(--text-muted)">${e.category?.name || '—'}</td>
+                <td>${e.brand || '—'}</td>
+                <td style="font-size:13px;color:var(--text-muted)">${e.model_number || '—'}</td>
+                <td style="color:var(--primary);font-weight:700">${fmtKES(e.rental_price_per_day)}</td>
+                <td>${e.purchase_price ? fmtKES(e.purchase_price) : '—'}</td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openBooking(${JSON.stringify(e).replace(/"/g, '&quot;')})">Book</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('equipment-container').innerHTML = items.map(e => `
+    <div class="equipment-card" onclick="openBooking(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+      <div class="equipment-card-img">
+        ${e.image ? `<img src="${e.image}" alt="${e.name}">` : '🔬'}
+        <span class="availability-tag status-badge available">Available</span>
+      </div>
+      <div class="equipment-card-body">
+        <div class="equipment-card-name">${e.name}</div>
+        <div class="equipment-card-brand">${e.brand} · ${e.model_number} · ${e.category?.name || ''}</div>
+        <div class="equipment-card-price">
+          <span class="price-value">${fmtKES(e.rental_price_per_day)}</span>
+          <span class="price-unit">/day</span>
+          ${e.purchase_price ? `<span style="margin-left:8px;font-size:12px;color:var(--text-muted)">or ${fmtKES(e.purchase_price)} to buy</span>` : ''}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="rating">★★★★☆</div>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openBooking(${JSON.stringify(e).replace(/"/g, '&quot;')})">Book Now</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openBooking(equipment) {
+  selectedEquipment = equipment;
+  document.getElementById('modal-equipment-name').textContent = equipment.name;
+  document.getElementById('modal-brand').textContent = `${equipment.brand} · ${equipment.model_number}`;
+  document.getElementById('modal-desc').textContent = equipment.description?.slice(0, 120) + (equipment.description?.length > 120 ? '…' : '');
+
+  // Toggle purchase tab
+  const purchaseTab = document.getElementById('purchase-tab');
+  purchaseTab.style.display = equipment.purchase_price ? '' : 'none';
+
+  // Load available units
+  await loadUnits(equipment.id);
+  openModal('booking-modal');
+  calcPrice();
+}
+
+async function loadUnits(equipmentId) {
+  try {
+    const units = await API.inventory.list();
+    const avail = units.filter ? units.filter(u => u.equipment === equipmentId || u.equipment?.id === equipmentId) : [];
+    const sel = document.getElementById('unit-select');
+    sel.innerHTML = avail.length > 0
+      ? avail.map(u => `<option value="${u.id}">${u.serial_number} — ${u.status}</option>`).join('')
+      : '<option value="">No units currently available</option>';
+  } catch {
+    document.getElementById('unit-select').innerHTML = '<option value="">Could not load units</option>';
+  }
+}
+
+function setBookingType(type, btn) {
+  bookingType = type;
+  document.querySelectorAll('#booking-type-tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rental-fields').style.display = type === 'RENTAL' ? 'block' : 'none';
+  calcPrice();
+}
+
+function calcPrice() {
+  if (!selectedEquipment) return;
+  const start = document.getElementById('modal-start-date').value;
+  const end = document.getElementById('modal-end-date').value;
+  const summary = document.getElementById('price-summary');
+
+  if (bookingType === 'PURCHASE') {
+    if (selectedEquipment.purchase_price) {
+      summary.style.display = 'block';
+      document.getElementById('ps-unit').textContent = '1 unit';
+      document.getElementById('ps-days').textContent = 'One-time purchase';
+      document.getElementById('ps-rate').textContent = fmtKES(selectedEquipment.purchase_price);
+      document.getElementById('ps-total').textContent = fmtKES(selectedEquipment.purchase_price);
+    }
+    return;
+  }
+
+  if (start && end) {
+    const days = Math.max(1, Math.ceil((new Date(end) - new Date(start)) / 86400000));
+    const total = days * selectedEquipment.rental_price_per_day;
+    summary.style.display = 'block';
+    document.getElementById('ps-unit').textContent = selectedEquipment.serial_number || '1 unit';
+    document.getElementById('ps-days').textContent = `${days} day${days > 1 ? 's' : ''}`;
+    document.getElementById('ps-rate').textContent = fmtKES(selectedEquipment.rental_price_per_day) + '/day';
+    document.getElementById('ps-total').textContent = fmtKES(total);
+  } else {
+    summary.style.display = 'none';
+  }
+}
+
+async function submitBooking() {
+  const unitId = document.getElementById('unit-select').value;
+  if (!unitId) { Toast.error('Please select an available unit.'); return; }
+
+  const data = {
+    unit: unitId,
+    booking_type: bookingType,
+    start_date: document.getElementById('modal-start-date').value,
+    end_date: document.getElementById('modal-end-date').value,
+    pick_up_location: document.getElementById('modal-pickup').value,
+    drop_off_location: document.getElementById('modal-dropoff').value,
+  };
+
+  if (bookingType === 'RENTAL' && (!data.start_date || !data.end_date)) {
+    Toast.error('Please select rental dates.');
+    return;
+  }
+
+  const btn = event.target;
+  btn.textContent = 'Processing…'; btn.disabled = true;
+
+  try {
+    const result = await API.bookings.create(data);
+    if (result.checkout_url) {
+      Toast.success('Booking created! Redirecting to payment…');
+      setTimeout(() => window.location.href = result.checkout_url, 1200);
+    } else {
+      Toast.success('Booking submitted!');
+      closeModal('booking-modal');
+    }
+  } catch (err) {
+    const msg = err.data?.error || err.data?.detail || 'Booking failed. Please try again.';
+    Toast.error(msg);
+  } finally {
+    btn.textContent = '💳 Proceed to Payment'; btn.disabled = false;
+  }
+}
+</script>
+{% endblock %}

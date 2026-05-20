@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block title %}My Equipment — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">My Equipment</div>
+    <div class="page-subtitle">Manage your lab equipment listings</div>
+  </div>
+  <button class="btn btn-primary" onclick="openModal('add-equipment-modal')">+ Add Equipment</button>
+</div>
+
+<div class="stats-grid fade-in stagger-1">
+  <div class="stat-card blue">
+    <div class="stat-icon">🔬</div>
+    <div class="stat-value" id="total-eq">—</div>
+    <div class="stat-label">Total Listings</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon">📦</div>
+    <div class="stat-value" id="total-units">—</div>
+    <div class="stat-label">Total Units</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">💰</div>
+    <div class="stat-value" id="avg-price">—</div>
+    <div class="stat-label">Avg. Rental/Day (KES)</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">🏷️</div>
+    <div class="stat-value" id="categories-count">—</div>
+    <div class="stat-label">Categories</div>
+  </div>
+</div>
+
+<div class="card fade-in stagger-2">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+    <div class="card-title" style="margin-bottom:0">Equipment Listings</div>
+    <div class="header-search" style="flex:1;min-width:200px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-eq" placeholder="Search equipment…" oninput="filterEq()">
+    </div>
+  </div>
+  <div id="equipment-table">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ADD EQUIPMENT MODAL -->
+<div class="modal-overlay" id="add-equipment-modal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title" id="eq-modal-title">Add New Equipment</div>
+      <button class="modal-close" onclick="closeModal('add-equipment-modal')">✕</button>
+    </div>
+
+    <input type="hidden" id="edit-eq-id">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Equipment Name *</label>
+        <input type="text" class="form-control" id="eq-name" placeholder="e.g. Analytical Balance">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Brand *</label>
+        <input type="text" class="form-control" id="eq-brand" placeholder="e.g. Mettler Toledo">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Model Number *</label>
+        <input type="text" class="form-control" id="eq-model" placeholder="e.g. ME204">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input type="text" class="form-control" id="eq-category" placeholder="e.g. Weighing Equipment">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description *</label>
+      <textarea class="form-control" id="eq-desc" rows="3" placeholder="Describe the equipment, its uses and specifications…" style="resize:vertical"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Rental Price/Day (KES) *</label>
+        <input type="number" class="form-control" id="eq-rental-price" placeholder="2500" min="0" step="50">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Purchase Price (KES)</label>
+        <input type="number" class="form-control" id="eq-purchase-price" placeholder="Optional" min="0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Serial Numbers (one per line)</label>
+      <textarea class="form-control" id="eq-serials" rows="3" placeholder="SN-001&#10;SN-002&#10;SN-003" style="resize:vertical;font-family:monospace"></textarea>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Each serial number creates a separate physical unit in inventory</div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="saveEquipment()">
+      Save Equipment
+    </button>
+  </div>
+</div>
+
+<!-- EDIT CONFIRMATION via same modal, delete modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">🗑️</div>
+    <h3 style="margin-bottom:8px">Delete Equipment?</h3>
+    <p style="color:var(--text-secondary);margin-bottom:24px;font-size:14px">This will permanently delete the equipment listing and all associated units. This cannot be undone.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-ghost" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allEquipment = [];
+let deleteTargetId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth(['VENDOR']);
+  await loadEquipment();
+});
+
+async function loadEquipment() {
+  try {
+    const data = await API.catalog.myEquipment();
+    allEquipment = Array.isArray(data) ? data : (data.results || []);
+    renderTable(allEquipment);
+
+    document.getElementById('total-eq').textContent = allEquipment.length;
+    const cats = new Set(allEquipment.map(e => e.category?.name).filter(Boolean));
+    document.getElementById('categories-count').textContent = cats.size;
+
+    // Fetch units count
+    try {
+      const inv = await API.inventory.list();
+      const units = Array.isArray(inv) ? inv : [];
+      document.getElementById('total-units').textContent = units.length;
+    } catch { document.getElementById('total-units').textContent = '—'; }
+
+    const avgPrice = allEquipment.length > 0
+      ? Math.round(allEquipment.reduce((s, e) => s + parseFloat(e.rental_price_per_day), 0) / allEquipment.length)
+      : 0;
+    document.getElementById('avg-price').textContent = avgPrice.toLocaleString();
+
+  } catch (err) {
+    document.getElementById('equipment-table').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.data?.detail || 'Failed to load'}</p></div>`;
+  }
+}
+
+function filterEq() {
+  const q = document.getElementById('search-eq').value.toLowerCase();
+  renderTable(allEquipment.filter(e => e.name.toLowerCase().includes(q) || e.brand?.toLowerCase().includes(q)));
+}
+
+function renderTable(items) {
+  if (items.length === 0) {
+    document.getElementById('equipment-table').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔬</div>
+        <h3>No equipment listed</h3>
+        <p>Add your first equipment to start receiving bookings</p>
+        <button class="btn btn-primary" onclick="openModal('add-equipment-modal')">+ Add Equipment</button>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('equipment-table').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Equipment</th><th>Category</th><th>Model</th>
+          <th>Rental/Day</th><th>Purchase</th><th>Created</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${items.map(e => `
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:36px;height:36px;background:var(--bg-elevated);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔬</div>
+                  <div>
+                    <div style="font-weight:600">${e.name}</div>
+                    <div style="font-size:12px;color:var(--text-muted)">${e.brand}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--text-secondary)">${e.category?.name || '—'}</td>
+              <td style="font-size:13px;color:var(--text-muted)">${e.model_number}</td>
+              <td style="color:var(--primary);font-weight:700">${fmtKES(e.rental_price_per_day)}</td>
+              <td>${e.purchase_price ? fmtKES(e.purchase_price) : '—'}</td>
+              <td style="font-size:12px;color:var(--text-muted)">${fmtDate(e.created_at)}</td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-ghost btn-sm" onclick="editEquipment(${JSON.stringify(e).replace(/"/g, '&quot;')})">✏️ Edit</button>
+                  <button class="btn btn-danger btn-sm" onclick="confirmDelete(${e.id})">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function editEquipment(e) {
+  document.getElementById('eq-modal-title').textContent = 'Edit Equipment';
+  document.getElementById('edit-eq-id').value = e.id;
+  document.getElementById('eq-name').value = e.name;
+  document.getElementById('eq-brand').value = e.brand;
+  document.getElementById('eq-model').value = e.model_number;
+  document.getElementById('eq-category').value = e.category?.name || '';
+  document.getElementById('eq-desc').value = e.description;
+  document.getElementById('eq-rental-price').value = e.rental_price_per_day;
+  document.getElementById('eq-purchase-price').value = e.purchase_price || '';
+  document.getElementById('eq-serials').value = '';
+  openModal('add-equipment-modal');
+}
+
+function resetForm() {
+  document.getElementById('eq-modal-title').textContent = 'Add New Equipment';
+  document.getElementById('edit-eq-id').value = '';
+  ['eq-name','eq-brand','eq-model','eq-category','eq-desc','eq-rental-price','eq-purchase-price','eq-serials']
+    .forEach(id => document.getElementById(id).value = '');
+}
+
+async function saveEquipment() {
+  const id = document.getElementById('edit-eq-id').value;
+  const serials = document.getElementById('eq-serials').value.split('\n').map(s => s.trim()).filter(Boolean);
+
+  const data = {
+    name: document.getElementById('eq-name').value.trim(),
+    brand: document.getElementById('eq-brand').value.trim(),
+    model_number: document.getElementById('eq-model').value.trim(),
+    description: document.getElementById('eq-desc').value.trim(),
+    rental_price_per_day: parseFloat(document.getElementById('eq-rental-price').value),
+    purchase_price: document.getElementById('eq-purchase-price').value || null,
+    serial_numbers: serials,
+  };
+
+  if (!data.name || !data.brand || !data.model_number || !data.rental_price_per_day) {
+    Toast.error('Please fill in all required fields.'); return;
+  }
+
+  try {
+    if (id) {
+      await API.catalog.update(id, data);
+      Toast.success('Equipment updated!');
+    } else {
+      await API.catalog.create(data);
+      Toast.success('Equipment added successfully!');
+    }
+    closeModal('add-equipment-modal');
+    resetForm();
+    await loadEquipment();
+  } catch (err) {
+    const msg = err.data?.detail || JSON.stringify(err.data) || 'Save failed.';
+    Toast.error(msg);
+  }
+}
+
+function confirmDelete(id) {
+  deleteTargetId = id;
+  openModal('delete-modal');
+  document.getElementById('confirm-delete-btn').onclick = async () => {
+    try {
+      await API.catalog.delete(deleteTargetId);
+      Toast.success('Equipment deleted.');
+      closeModal('delete-modal');
+      await loadEquipment();
+    } catch (err) {
+      Toast.error(err.data?.detail || 'Delete failed.');
+    }
+  };
+}
+</script>
+{% endblock %}

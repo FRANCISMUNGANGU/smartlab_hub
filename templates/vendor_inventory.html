@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}Inventory — SmartLab Hub{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+  <div>
+    <div class="page-title">Inventory Management</div>
+    <div class="page-subtitle">Track all physical equipment units</div>
+  </div>
+</div>
+
+<div class="stats-grid fade-in stagger-1">
+  <div class="stat-card green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-value" id="avail-count">—</div>
+    <div class="stat-label">Available</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-icon">🔄</div>
+    <div class="stat-value" id="rented-count">—</div>
+    <div class="stat-label">Currently Rented</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon">🔧</div>
+    <div class="stat-value" id="maint-count">—</div>
+    <div class="stat-label">In Maintenance</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-icon">💔</div>
+    <div class="stat-value" id="damaged-count">—</div>
+    <div class="stat-label">Damaged</div>
+  </div>
+</div>
+
+<div class="card fade-in stagger-2">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+    <div class="card-title" style="margin-bottom:0">Physical Unit Tracker</div>
+    <div class="filters-bar" style="margin-bottom:0;flex:1">
+      <button class="filter-chip active" onclick="filterStatus('', this)">All</button>
+      <button class="filter-chip" onclick="filterStatus('AVAILABLE', this)">Available</button>
+      <button class="filter-chip" onclick="filterStatus('RENTED', this)">Rented</button>
+      <button class="filter-chip" onclick="filterStatus('MAINTENANCE', this)">Maintenance</button>
+      <button class="filter-chip" onclick="filterStatus('DAMAGED', this)">Damaged</button>
+    </div>
+  </div>
+
+  <div id="inventory-table">
+    <div class="loading-overlay"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- CHECK-IN MODAL -->
+<div class="modal-overlay" id="checkin-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Process Check-In</div>
+      <button class="modal-close" onclick="closeModal('checkin-modal')">✕</button>
+    </div>
+    <div id="checkin-unit-info" style="background:var(--bg-elevated);border-radius:8px;padding:14px;margin-bottom:20px"></div>
+
+    <div class="form-group">
+      <label class="form-label">Equipment Condition</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="role-option selected" id="condition-ok" onclick="setCondition(false)">
+          <div style="font-size:24px;margin-bottom:4px">✅</div>
+          <div style="font-size:13px;font-weight:600;color:var(--accent)">Good Condition</div>
+        </div>
+        <div class="role-option" id="condition-damaged" onclick="setCondition(true)">
+          <div style="font-size:24px;margin-bottom:4px">⚠️</div>
+          <div style="font-size:13px;font-weight:600">Has Damage</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="damage-desc-wrap" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Damage Description *</label>
+        <textarea class="form-control" id="checkin-damage-desc" rows="3" placeholder="Describe the damage observed…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Technician Notes (optional)</label>
+      <textarea class="form-control" id="checkin-notes" rows="2" placeholder="Any additional notes about the return…" style="resize:vertical"></textarea>
+    </div>
+
+    <input type="hidden" id="checkin-unit-id">
+    <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px" onclick="submitCheckIn()">
+      ✓ Confirm Check-In
+    </button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allUnits = [];
+let statusFilter = '';
+let hasDamage = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth(['VENDOR']);
+  await loadInventory();
+});
+
+async function loadInventory() {
+  try {
+    const data = await API.inventory.list();
+    allUnits = Array.isArray(data) ? data : (data.results || []);
+
+    document.getElementById('avail-count').textContent = allUnits.filter(u => u.status === 'AVAILABLE').length;
+    document.getElementById('rented-count').textContent = allUnits.filter(u => u.status === 'RENTED').length;
+    document.getElementById('maint-count').textContent = allUnits.filter(u => ['MAINTENANCE','CALIBRATION'].includes(u.status)).length;
+    document.getElementById('damaged-count').textContent = allUnits.filter(u => u.status === 'DAMAGED').length;
+
+    renderTable();
+  } catch (err) {
+    document.getElementById('inventory-table').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.data?.detail || 'Failed to load inventory'}</p></div>`;
+  }
+}
+
+function filterStatus(status, btn) {
+  statusFilter = status;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const items = statusFilter ? allUnits.filter(u => u.status === statusFilter) : allUnits;
+
+  if (items.length === 0) {
+    document.getElementById('inventory-table').innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><h3>No units found</h3><p>Units are created when you add equipment with serial numbers</p></div>`;
+    return;
+  }
+
+  document.getElementById('inventory-table').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Serial Number</th><th>Equipment</th><th>Internal ID</th>
+          <th>Status</th><th>Last Calibration</th><th>Next Maintenance</th>
+          <th>Current User</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${items.map(u => `
+            <tr>
+              <td style="font-family:monospace;font-weight:600;color:var(--primary)">${u.serial_number}</td>
+              <td>
+                <div style="font-weight:600">${u.equipment?.name || '—'}</div>
+                <div style="font-size:12px;color:var(--text-muted)">${u.equipment?.brand || ''}</div>
+              </td>
+              <td style="font-size:13px;color:var(--text-muted)">${u.internal_id || '—'}</td>
+              <td>${statusBadge(u.status)}</td>
+              <td style="font-size:12px;color:var(--text-muted)">${fmtDate(u.last_calibration_date)}</td>
+              <td style="font-size:12px;color:${u.next_maintenance_due && new Date(u.next_maintenance_due) < new Date() ? 'var(--danger)' : 'var(--text-muted)'}">${fmtDate(u.next_maintenance_due)}</td>
+              <td style="font-size:13px">${u.last_student?.username || '—'}</td>
+              <td>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  ${u.status === 'RENTED' ? `<button class="btn btn-accent btn-sm" onclick="openCheckIn(${JSON.stringify(u).replace(/"/g, '&quot;')})">Check In</button>` : ''}
+                  <button class="btn btn-ghost btn-sm" onclick="updateStatus(${u.id}, '${u.status}')">Update</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function openCheckIn(unit) {
+  document.getElementById('checkin-unit-id').value = unit.id;
+  document.getElementById('checkin-unit-info').innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="font-size:28px">🔬</div>
+      <div>
+        <div style="font-weight:700">${unit.equipment?.name || 'Equipment'}</div>
+        <div style="font-size:13px;color:var(--text-muted)">SN: ${unit.serial_number}</div>
+        ${unit.current_booking ? `<div style="font-size:12px;color:var(--text-secondary)">Borrowed by: ${unit.current_booking.user?.username || '—'}</div>` : ''}
+      </div>
+    </div>`;
+  setCondition(false);
+  openModal('checkin-modal');
+}
+
+function setCondition(damaged) {
+  hasDamage = damaged;
+  document.getElementById('condition-ok').classList.toggle('selected', !damaged);
+  document.getElementById('condition-damaged').classList.toggle('selected', damaged);
+  document.getElementById('damage-desc-wrap').style.display = damaged ? 'block' : 'none';
+}
+
+async function submitCheckIn() {
+  const unitId = document.getElementById('checkin-unit-id').value;
+  const description = document.getElementById('checkin-damage-desc').value.trim();
+
+  if (hasDamage && !description) { Toast.error('Please describe the damage.'); return; }
+
+  try {
+    await API.inventory.checkIn(unitId, { has_damage: hasDamage, description });
+    Toast.success('Check-in processed successfully!');
+    closeModal('checkin-modal');
+    await loadInventory();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Check-in failed.');
+  }
+}
+
+async function updateStatus(unitId, currentStatus) {
+  const statuses = ['AVAILABLE', 'MAINTENANCE', 'CALIBRATION', 'DAMAGED'];
+  const opts = statuses.filter(s => s !== currentStatus);
+  const chosen = prompt(`Update status for unit ${unitId}.\nOptions: ${opts.join(', ')}\n\nEnter new status:`);
+  if (!chosen || !statuses.includes(chosen.toUpperCase())) { Toast.warning('Invalid status.'); return; }
+
+  try {
+    await API.inventory.update(unitId, { status: chosen.toUpperCase() });
+    Toast.success('Status updated!');
+    await loadInventory();
+  } catch (err) {
+    Toast.error(err.data?.detail || 'Update failed.');
+  }
+}
+</script>
+{% endblock %}
