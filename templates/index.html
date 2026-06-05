@@ -3,436 +3,959 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartLab Hub — Scientific Equipment Platform</title>
+  <title>SmartLab Hub — Premium Scientific Equipment Platform</title>
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body{
-      font-family: 'DM Sans', sans-serif;
-      background:#050816;
-      color:white;
-      overflow-x:hidden;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0F172A; /* Slate 900 Deep Blue */
+      color: #F8FAFC;
+      overflow-x: hidden;
     }
 
-    h1,h2,h3,h4{
-      font-family:'Syne', sans-serif;
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', sans-serif;
     }
 
-    .glass{
-      background: rgba(255,255,255,0.05);
+    .glass {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-light {
+      background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(12px);
-      border:1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .hero-bg{
+    .hero-bg {
       background:
-      radial-gradient(circle at top left, rgba(37,99,235,.35), transparent 30%),
-      radial-gradient(circle at bottom right, rgba(16,185,129,.25), transparent 30%),
-      #050816;
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.25), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.15), transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.1), transparent 50%),
+        #0F172A;
     }
 
-    .floating{
-      animation: float 5s ease-in-out infinite;
+    .floating {
+      animation: float 6s ease-in-out infinite;
     }
 
-    @keyframes float{
-      0%,100%{ transform:translateY(0px);}
-      50%{ transform:translateY(-10px);}
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(0.5deg); }
     }
 
-    .grid-pattern{
+    .grid-pattern {
       background-image:
-      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-      background-size:60px 60px;
+        linear-gradient(rgba(255, 255, 255, .02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .02) 1px, transparent 1px);
+      background-size: 50px 50px;
     }
 
-    .gradient-text{
-      background: linear-gradient(to right,#38bdf8,#22c55e);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
+    .gradient-text {
+      background: linear-gradient(135deg, #38BDF8 0%, #2563EB 50%, #10B981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Custom Scrollbar for sleek SaaS look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0F172A;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2563EB;
     }
   </style>
 </head>
 
-<body class="hero-bg">
+<body class="hero-bg min-h-screen">
 
-<!-- NAVBAR -->
-<nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#050816]/80 backdrop-blur-xl">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0F172A]/80 backdrop-blur-xl transition-all duration-300" id="main-nav">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="flex items-center justify-between h-20">
 
-      <a href="/" class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 flex items-center justify-center text-xl shadow-lg shadow-sky-500/30">
-          ⚗️
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 via-cyan-500 to-emerald-500 flex items-center justify-center text-xl shadow-lg shadow-blue-500/20 transform group-hover:scale-105 transition-transform">
+          🔬
         </div>
-
         <div>
-          <h1 class="text-xl font-bold">SmartLab Hub</h1>
-          <p class="text-xs text-slate-400">Scientific Equipment Platform</p>
+          <h1 class="text-xl font-bold tracking-tight text-white">SmartLab <span class="text-blue-500">Hub</span></h1>
+          <p class="text-[10px] tracking-widest text-slate-400 uppercase font-semibold">Kenya Ecosystem</p>
         </div>
       </a>
 
-      <div class="hidden lg:flex items-center gap-8 text-sm">
-        <a href="#features" class="hover:text-sky-400 transition">Features</a>
-        <a href="#how" class="hover:text-sky-400 transition">How It Works</a>
-        <a href="#roles" class="hover:text-sky-400 transition">Roles</a>
-        <a href="#gallery" class="hover:text-sky-400 transition">Equipment</a>
+      <div class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#categories" class="hover:text-blue-400 transition-colors">Categories</a>
+        <a href="#marketplace" class="hover:text-blue-400 transition-colors">Marketplace</a>
+        <a href="#how-it-works" class="hover:text-blue-400 transition-colors">How It Works</a>
+        <a href="#why-choose-us" class="hover:text-blue-400 transition-colors">Benefits</a>
+        <button onclick="toggleDashboardView()" class="px-3 py-1.5 rounded-lg bg-white/5 text-xs border border-white/10 text-cyan-400 hover:bg-white/10 transition-all">
+          ✨ Live SaaS Demo View
+        </button>
       </div>
 
       <div class="flex items-center gap-4">
-        <a href="/login"
-           class="hidden md:flex px-5 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition">
+        <a href="/login" class="hidden md:inline-flex text-sm font-medium text-slate-300 hover:text-white px-4 py-2.5 rounded-xl transition-colors">
           Sign In
         </a>
-
-        <a href="/register"
-           class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 hover:scale-105 transition shadow-lg shadow-sky-500/30">
+        <a href="/register" class="px-5 py-2.5 rounded-xl bg-blue-600 text-sm font-semibold text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30">
           Get Started
         </a>
+        <button class="lg:hidden text-white focus:outline-none" id="mobile-menu-btn">
+          📊
+        </button>
       </div>
 
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="relative min-h-screen flex items-center overflow-hidden grid-pattern">
+<section class="relative min-h-screen flex items-center overflow-hidden grid-pattern pt-20">
+  <div class="absolute inset-0 bg-[#0F172A]/40 pointer-events-none"></div>
 
-  <div class="absolute inset-0 bg-black/30"></div>
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 py-16 w-full">
+    <div class="grid lg:grid-cols-12 gap-12 items-center">
 
-  <div class="max-w-7xl mx-auto px-6 lg:px-10 relative z-10 pt-32">
-
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-
-      <!-- LEFT -->
-      <div>
-
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 text-sky-300 text-sm">
-          ✨ Smart inventory & booking management
+      <div class="lg:col-span-7 text-left">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border-white/10 mb-6 text-xs font-medium text-cyan-400 shadow-inner">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Premium Laboratory Network across Kenya
         </div>
 
-        <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-8">
-          Modern Platform For
-          <span class="gradient-text">
-            Scientific Equipment
-          </span>
-          Management
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+          Rent Laboratory Equipment <br />
+          <span class="gradient-text">Across Kenya</span>
         </h1>
 
-        <p class="text-slate-300 text-lg leading-relaxed max-w-2xl mb-10">
-          SmartLab Hub enables universities, researchers, laboratories, and vendors
-          to seamlessly manage, rent, and track scientific equipment in real time.
+        <p class="text-slate-300 text-base sm:text-lg max-w-2xl mb-8 leading-relaxed font-normal">
+          Access modern laboratory equipment for research, testing, education, and innovation without the immense cost of ownership. Connecting universities, hospitals, private labs, and brilliant students.
         </p>
 
-        <div class="flex flex-wrap gap-5 mb-14">
-
-          <a href="/register"
-             class="px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 font-semibold shadow-2xl shadow-sky-500/20 hover:scale-105 transition">
-            🚀 Start Booking
+        <div class="flex flex-wrap gap-4 mb-12">
+          <a href="#marketplace" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 font-semibold text-sm shadow-xl shadow-blue-500/20 hover:opacity-95 transform hover:-translate-y-0.5 transition-all text-white">
+            Browse Equipment
           </a>
-
-          <a href="#features"
-             class="px-8 py-4 rounded-2xl glass hover:bg-white/10 transition">
-            Explore Features
+          <a href="/register" class="px-6 py-3.5 rounded-xl glass border-white/10 hover:bg-white/10 font-semibold text-sm transform hover:-translate-y-0.5 transition-all text-white">
+            Become a Supplier
           </a>
-
         </div>
 
-        <!-- STATS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-3xl font-extrabold text-sky-400">500+</h2>
-            <p class="text-sm text-slate-400 mt-2">Equipment Items</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/5">
+          <div class="glass-light rounded-xl p-4">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="count-equipment" data-target="840">0</h2>
+            <p class="text-xs text-slate-400 mt-1">Available Equipment</p>
           </div>
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-3xl font-extrabold text-emerald-400">1.2K+</h2>
-            <p class="text-sm text-slate-400 mt-2">Bookings</p>
+          <div class="glass-light rounded-xl p-4">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-400 tracking-tight" id="count-rentals" data-target="3250">0</h2>
+            <p class="text-xs text-slate-400 mt-1">Active Rentals</p>
           </div>
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-3xl font-extrabold text-orange-400">98%</h2>
-            <p class="text-sm text-slate-400 mt-2">Satisfaction</p>
+          <div class="glass-light rounded-xl p-4">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight" id="count-institutions" data-target="118">0</h2>
+            <p class="text-xs text-slate-400 mt-1">Registered Institutions</p>
           </div>
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-3xl font-extrabold text-pink-400">50+</h2>
-            <p class="text-sm text-slate-400 mt-2">Vendors</p>
+          <div class="glass-light rounded-xl p-4">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-tight" id="count-counties" data-target="47">0</h2>
+            <p class="text-xs text-slate-400 mt-1">Counties Served</p>
           </div>
-
         </div>
-
       </div>
 
-      <!-- RIGHT -->
-      <div class="relative hidden lg:block">
+      <div class="lg:col-span-5 relative hidden lg:block">
+        <div class="absolute -top-12 -left-12 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full"></div>
+        <div class="absolute bottom-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full"></div>
 
-        <div class="absolute -top-10 -left-10 w-72 h-72 bg-sky-500/20 blur-3xl rounded-full"></div>
-        <div class="absolute bottom-0 right-0 w-72 h-72 bg-emerald-500/20 blur-3xl rounded-full"></div>
-
-        <img
-          src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200&auto=format&fit=crop"
-          class="relative z-10 rounded-3xl shadow-2xl floating border border-white/10"
-          alt="Scientific laboratory"
-        />
-
+        <div class="relative z-10 glass p-3 rounded-3xl border-white/10 shadow-2xl floating">
+          <img
+            src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop"
+            class="rounded-2xl shadow-inner object-cover h-[450px] w-full"
+            alt="Scientists working with modern laboratory instruments"
+          />
+          <div class="absolute bottom-8 left-8 right-8 glass p-4 rounded-xl border-white/10 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400">Featured High-End System</p>
+              <h4 class="text-sm font-bold text-white">NextGen Real-Time PCR Machine</h4>
+            </div>
+            <span class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 rounded-md border border-emerald-500/30">Available</span>
+          </div>
+        </div>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section id="features" class="py-28">
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-
-    <div class="text-center mb-20">
-      <p class="text-sky-400 uppercase tracking-[0.3em] text-sm font-bold mb-4">
-        Features
-      </p>
-
-      <h2 class="text-5xl font-extrabold mb-6">
-        Everything Your Lab Needs
-      </h2>
-
-      <p class="text-slate-400 max-w-2xl mx-auto text-lg">
-        A powerful ecosystem for scientific equipment rentals, inventory, analytics, and collaboration.
+<section id="categories" class="py-24 border-t border-white/5 bg-slate-900/50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-blue-500">Classifications</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-2">Equipment Categories</h2>
+      </div>
+      <p class="text-slate-400 max-w-md mt-2 md:mt-0 text-sm">
+        Instantly narrow down your empirical criteria by exploring specialized research domains.
       </p>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-      <!-- CARD -->
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-sky-500/20 flex items-center justify-center text-3xl mb-6">
-          🔬
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Equipment Catalog</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Browse microscopes, centrifuges, incubators, spectrophotometers and more.
-        </p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" id="categories-container">
       </div>
-
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-3xl mb-6">
-          📅
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Smart Booking</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Reserve equipment instantly with secure online payments and scheduling.
-        </p>
-      </div>
-
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-orange-500/20 flex items-center justify-center text-3xl mb-6">
-          📦
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Inventory Tracking</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Track calibration dates, serial numbers, maintenance history, and availability.
-        </p>
-      </div>
-
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center text-3xl mb-6">
-          ⚠️
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Incident Reports</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Report damages, malfunctions, and monitor risk within the ecosystem.
-        </p>
-      </div>
-
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-6">
-          ⭐
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Ratings & Reviews</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Improve equipment quality with user reviews and researcher feedback.
-        </p>
-      </div>
-
-      <div class="glass rounded-3xl p-8 hover:-translate-y-2 transition duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-3xl mb-6">
-          📈
-        </div>
-
-        <h3 class="text-2xl font-bold mb-4">Analytics Dashboard</h3>
-
-        <p class="text-slate-400 leading-relaxed">
-          Get insights into bookings, revenue, equipment usage, and lab performance.
-        </p>
-      </div>
-
-    </div>
   </div>
 </section>
 
-<!-- EQUIPMENT GALLERY -->
-<section id="gallery" class="py-28 bg-white/5 border-y border-white/10">
+<section id="marketplace" class="py-24 relative border-t border-white/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
 
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-
-    <div class="text-center mb-20">
-      <h2 class="text-5xl font-extrabold mb-6">
-        Scientific Equipment
-      </h2>
-
-      <p class="text-slate-400 text-lg">
-        Showcase available laboratory instruments and tools.
-      </p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Verified Stocks</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-2">Featured Marketplace Gear</h2>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0 glass p-1.5 rounded-xl border-white/5 text-xs">
+        <span class="px-2 text-slate-400 font-medium">Viewing Perspective:</span>
+        <button onclick="setUIRole('Researcher')" class="role-btn px-3 py-1.5 rounded-lg bg-blue-600 font-semibold text-white transition-all">Researcher</button>
+        <button onclick="setUIRole('Student')" class="role-btn px-3 py-1.5 rounded-lg hover:bg-white/5 text-slate-400 transition-all">Student</button>
+        <button onclick="setUIRole('Equipment Owner')" class="role-btn px-3 py-1.5 rounded-lg hover:bg-white/5 text-slate-400 transition-all">Owner</button>
+      </div>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" id="marketplace-grid">
+      </div>
 
-      <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=1200&auto=format&fit=crop"
-           class="rounded-3xl h-80 w-full object-cover hover:scale-105 transition duration-300"/>
-
-      <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1200&auto=format&fit=crop"
-           class="rounded-3xl h-80 w-full object-cover hover:scale-105 transition duration-300"/>
-
-      <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop"
-           class="rounded-3xl h-80 w-full object-cover hover:scale-105 transition duration-300"/>
-
-    </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section id="how" class="py-28">
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-
-    <div class="text-center mb-20">
-      <h2 class="text-5xl font-extrabold mb-6">How It Works</h2>
-      <p class="text-slate-400 text-lg">
-        From booking to returning equipment in simple steps.
+<section id="how-it-works" class="py-24 bg-slate-900/60 border-t border-white/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">Streamlined Workflow</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-2">How It Works</h2>
+      <p class="text-slate-400 mt-4 text-sm sm:text-base">
+        A structured, compliant framework structured explicitly for rapid provisioning and deployment.
       </p>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-      <div class="glass rounded-3xl p-8 text-center">
-        <div class="w-16 h-16 rounded-full bg-sky-500 mx-auto flex items-center justify-center text-2xl font-bold mb-6">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      
+      <div class="glass p-6 rounded-2xl relative border-white/5 text-center group hover:border-blue-500/30 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">
           1
         </div>
-
-        <h3 class="text-xl font-bold mb-3">Create Account</h3>
-        <p class="text-slate-400">Register as a researcher, student, vendor, or administrator.</p>
+        <h4 class="font-bold text-white mb-2 text-base">Search Equipment</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Filter across thousands of active systems located in verified Kenyan institutions.</p>
       </div>
 
-      <div class="glass rounded-3xl p-8 text-center">
-        <div class="w-16 h-16 rounded-full bg-emerald-500 mx-auto flex items-center justify-center text-2xl font-bold mb-6">
+      <div class="glass p-6 rounded-2xl relative border-white/5 text-center group hover:border-blue-500/30 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">
           2
         </div>
-
-        <h3 class="text-xl font-bold mb-3">Browse Equipment</h3>
-        <p class="text-slate-400">Explore equipment catalog and availability in real time.</p>
+        <h4 class="font-bold text-white mb-2 text-base">Book Online</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Select compliant dates matching your testing cohorts on our interactive digital calendar.</p>
       </div>
 
-      <div class="glass rounded-3xl p-8 text-center">
-        <div class="w-16 h-16 rounded-full bg-orange-500 mx-auto flex items-center justify-center text-2xl font-bold mb-6">
+      <div class="glass p-6 rounded-2xl relative border-white/5 text-center group hover:border-blue-500/30 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">
           3
         </div>
-
-        <h3 class="text-xl font-bold mb-3">Book & Pay</h3>
-        <p class="text-slate-400">Securely reserve equipment and make online payments.</p>
+        <h4 class="font-bold text-white mb-2 text-base">Secure Payment</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Complete transaction processing instantly through integrated corporate dynamic systems.</p>
       </div>
 
-      <div class="glass rounded-3xl p-8 text-center">
-        <div class="w-16 h-16 rounded-full bg-pink-500 mx-auto flex items-center justify-center text-2xl font-bold mb-6">
+      <div class="glass p-6 rounded-2xl relative border-white/5 text-center group hover:border-blue-500/30 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">
           4
         </div>
+        <h4 class="font-bold text-white mb-2 text-base">Receive Unit</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Insured logistics transport directly to your designated hub coordinates safely.</p>
+      </div>
 
-        <h3 class="text-xl font-bold mb-3">Use & Return</h3>
-        <p class="text-slate-400">Complete your research and submit equipment reviews.</p>
+      <div class="glass p-6 rounded-2xl relative border-white/5 text-center group hover:border-blue-500/30 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center text-lg font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">
+          5
+        </div>
+        <h4 class="font-bold text-white mb-2 text-base">Return Safely</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Submit your data logs, review asset parameters, and log-out the machine instance.</p>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="py-28">
+<section id="why-choose-us" class="py-24 border-t border-white/5 relative">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
 
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <span class="text-xs font-bold uppercase tracking-widest text-blue-400">Uncompromised Quality</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-2">Why Choose SmartLab Hub</h2>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-blue-500">🛡️</div>
+        <h3 class="text-lg font-bold text-white mb-2">Verified Equipment</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Every unit undergoes explicit biological, chemical, or operational engineering verification prior to indexing.</p>
+      </div>
+
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-emerald-400">💳</div>
+        <h3 class="text-lg font-bold text-white mb-2">Secure Payments</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Encrypted institutional escrow channels protect researchers and system owners throughout the tenancy life.</p>
+      </div>
+
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-cyan-400">⏱️</div>
+        <h3 class="text-lg font-bold text-white mb-2">Real-time Availability</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Live IoT state matrices block out overlapping reservation arrays immediately upon checkout approval.</p>
+      </div>
+
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-purple-400">🚚</div>
+        <h3 class="text-lg font-bold text-white mb-2">Nationwide Delivery</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Climate-controlled, shock-absorbent specialized courier fleets covering all 47 sovereign counties safely.</p>
+      </div>
+
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-pink-400">☂️</div>
+        <h3 class="text-lg font-bold text-white mb-2">Equipment Insurance</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Comprehensive risk coverage portfolios protect structural mechanics against operational errors or accidental anomalies.</p>
+      </div>
+
+      <div class="glass-light p-6 rounded-2xl border-white/5 hover:bg-white/[0.06] transition-all">
+        <div class="text-2xl mb-4 text-yellow-400">🛠️</div>
+        <h3 class="text-lg font-bold text-white mb-2">Technical Support</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Dedicated biomedical lab technicians on standby for real-time video calibration support and remote setups.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="py-24 bg-slate-900/40 border-t border-white/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <h2 class="text-3xl font-extrabold text-white">Endorsed by Clinical Professionals</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="glass p-6 rounded-2xl border-white/5 flex flex-col justify-between">
+        <p class="text-sm text-slate-300 italic leading-relaxed">"SmartLab Hub saved our clinical trial sequence. Accessing an ultra-high performance Spectrophotometer within Nairobi on demand minimized overheads by nearly 70%."</p>
+        <div class="mt-6 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">EK</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Dr. Evans Kiprop</h4>
+            <p class="text-[10px] text-slate-400">Lead Researcher, KEMRI</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border-white/5 flex flex-col justify-between">
+        <p class="text-sm text-slate-300 italic leading-relaxed">"As an equipment provider, listing our idle laboratory inventory on this platform has turned complex hardware stacks into steady asset streams for our hospital."</p>
+        <div class="mt-6 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs">AM</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Agnes Mutua</h4>
+            <p class="text-[10px] text-slate-400">Lab Director, Aga Khan Sub-Center</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border-white/5 flex flex-col justify-between">
+        <p class="text-sm text-slate-300 italic leading-relaxed">"Securing a high-end microscope for my master's thesis validation matrix was incredibly fluid. The student discount framework made it completely viable."</p>
+        <div class="mt-6 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center font-bold text-xs">JN</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">John Njuguna</h4>
+            <p class="text-[10px] text-slate-400">MSc Candidate, JKUAT</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-12 border-t border-white/5 bg-slate-950/60">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+    <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-6">Trusted by Leading Institutions Across Kenya</p>
+    <div class="flex flex-wrap items-center justify-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+      <span class="text-sm font-bold tracking-wider text-white">UNIVERSITY OF NAIROBI</span>
+      <span class="text-sm font-bold tracking-wider text-white">KENYATTA NATIONAL HOSPITAL</span>
+      <span class="text-sm font-bold tracking-wider text-white">KEMRI KENYA</span>
+      <span class="text-sm font-bold tracking-wider text-white">STRATHMORE UNIVERSITY</span>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 relative overflow-hidden">
   <div class="max-w-5xl mx-auto px-6">
+    <div class="glass rounded-[32px] p-12 text-center relative overflow-hidden border-white/10">
+      <div class="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/20 blur-[120px] rounded-full"></div>
+      <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-500/20 blur-[120px] rounded-full"></div>
 
-    <div class="glass rounded-[40px] p-14 text-center relative overflow-hidden">
-
-      <div class="absolute top-0 left-0 w-72 h-72 bg-sky-500/20 blur-3xl rounded-full"></div>
-      <div class="absolute bottom-0 right-0 w-72 h-72 bg-emerald-500/20 blur-3xl rounded-full"></div>
-
-      <div class="relative z-10">
-        <h2 class="text-5xl font-extrabold mb-6">
-          Ready To Modernize Your Lab?
-        </h2>
-
-        <p class="text-slate-300 text-lg max-w-2xl mx-auto mb-10">
-          Join institutions, vendors, and researchers already using SmartLab Hub.
-        </p>
-
-        <div class="flex flex-wrap justify-center gap-5">
-          <a href="/register"
-             class="px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 font-semibold shadow-xl shadow-sky-500/30 hover:scale-105 transition">
+      <div class="relative z-10 max-w-2xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4">Ready to Modernize Your Research Pipeline?</h2>
+        <p class="text-slate-300 text-sm sm:text-base mb-8">Join thousands of Kenyan scientists, laboratories, and universities optimizing hardware lifecycles today.</p>
+        
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/register" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 font-semibold text-sm shadow-xl shadow-blue-500/20 hover:scale-[1.01] transition-all text-white">
             Create Free Account
           </a>
-
-          <a href="/login"
-             class="px-8 py-4 rounded-2xl border border-white/10 hover:bg-white/10 transition">
+          <a href="/login" class="px-6 py-3.5 rounded-xl border border-white/10 hover:bg-white/5 font-semibold text-sm transition-all text-white">
             Sign In
           </a>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="border-t border-white/10 py-10">
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-
-    <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-
-      <div>
-        <h2 class="text-2xl font-bold">SmartLab Hub</h2>
-        <p class="text-slate-500 mt-2">
-          Built for African research institutions.
-        </p>
+<footer class="border-t border-white/5 bg-slate-950/80 py-16 text-xs text-slate-400">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+      
+      <div class="col-span-2">
+        <h3 class="text-base font-bold text-white mb-3">SmartLab Hub</h3>
+        <p class="leading-relaxed text-slate-400 max-w-xs mb-4">Kenya's premier secure SaaS infrastructure powering hardware tenancy configurations across diagnostic and academic laboratory spaces.</p>
+        <span class="text-[10px] text-slate-500">© 2026 SmartLab Hub. Built for East African Research Excellence.</span>
       </div>
 
-      <div class="flex gap-8 text-slate-400 text-sm">
-        <a href="#" class="hover:text-white transition">About</a>
-        <a href="#" class="hover:text-white transition">Documentation</a>
-        <a href="#" class="hover:text-white transition">Privacy</a>
-        <a href="#" class="hover:text-white transition">Contact</a>
+      <div>
+        <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-[11px]">Categories</h4>
+        <ul class="space-y-2">
+          <li><a href="#categories" class="hover:text-white transition-colors">Microscopy Systems</a></li>
+          <li><a href="#categories" class="hover:text-white transition-colors">PCR Replicators</a></li>
+          <li><a href="#categories" class="hover:text-white transition-colors">Spectrophotometers</a></li>
+          <li><a href="#categories" class="hover:text-white transition-colors">Incubators</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-[11px]">Platform</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Technical Support</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Contact Matrix</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-[11px]">Legal & Compliance</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Insurance Portals</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Escrow Rules</a></li>
+        </ul>
       </div>
 
     </div>
-
   </div>
 </footer>
+
+
+<div id="booking-modal" class="fixed inset-0 z-50 overflow-y-auto hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="glass w-full max-w-4xl rounded-3xl border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 relative">
+    
+    <button onclick="closeBookingModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white font-bold text-lg focus:outline-none">✕</button>
+
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5 max-w-md mx-auto text-[11px] font-bold uppercase tracking-wider">
+      <span id="step-indicator-1" class="text-blue-500 border-b-2 border-blue-500 pb-1">1. Specifications</span>
+      <span id="step-indicator-2" class="text-slate-500">2. Logistics & Dates</span>
+      <span id="step-indicator-3" class="text-slate-500">3. Escrow Payment</span>
+    </div>
+
+    <div class="grid md:grid-cols-12 gap-8" id="modal-content-grid">
+      </div>
+  </div>
+</div>
+
+
+<div id="dashboard-demo-overlay" class="fixed inset-0 z-50 bg-[#0F172A] hidden overflow-hidden flex">
+  
+  <aside class="w-64 bg-slate-950 border-r border-white/5 flex flex-col justify-between p-4 shrink-0">
+    <div>
+      <div class="flex items-center gap-3 pb-6 mb-6 border-b border-white/5">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-sm">🧪</div>
+        <div>
+          <h2 class="text-sm font-bold text-white">SmartLab SaaS</h2>
+          <p class="text-[9px] text-slate-500 font-mono" id="active-role-badge">Role: System Admin</p>
+        </div>
+      </div>
+
+      <nav class="space-y-1 text-xs font-medium text-slate-400">
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 text-white"><span>📊</span> Dashboard</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>🔬</span> Equipment Inventory</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>📅</span> Active Rentals</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>🔒</span> Reservations</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>💳</span> Payments Logs</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>🏢</span> Suppliers Index</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>📈</span> Reports & Metrics</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>💬</span> Messages</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"><span>⚙️</span> Settings Matrix</a>
+      </nav>
+    </div>
+
+    <button onclick="toggleDashboardView()" class="w-full py-2 bg-slate-900 border border-white/10 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors">
+      Return to Marketplace
+    </button>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-6 md:p-8">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">System Operations Overview</h1>
+        <p class="text-xs text-slate-400">Real-time telemetric analytics across laboratory environments.</p>
+      </div>
+      
+      <div class="glass px-4 py-2 rounded-xl text-xs flex items-center gap-3 border-white/5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-300 font-mono">Live Sync Engine: 100% Operational</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="glass p-4 rounded-xl border-white/5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase">Total Equipment Instances</p>
+        <h3 class="text-2xl font-extrabold text-white mt-2">1,420 Units</h3>
+        <span class="text-[10px] text-emerald-400 font-mono">+12.4% MoM</span>
+      </div>
+      <div class="glass p-4 rounded-xl border-white/5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase">Tenancy Tenures Active</p>
+        <h3 class="text-2xl font-extrabold text-blue-400 mt-2">384 Leases</h3>
+        <span class="text-[10px] text-slate-400 font-mono">Across 18 Counties</span>
+      </div>
+      <div class="glass p-4 rounded-xl border-white/5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase">Monthly Platform Revenue</p>
+        <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">KES 4.85M</h3>
+        <span class="text-[10px] text-emerald-400 font-mono">Processed via Escrow</span>
+      </div>
+      <div class="glass p-4 rounded-xl border-white/5">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase">Pending Requests Queue</p>
+        <h3 class="text-2xl font-extrabold text-amber-400 mt-2">14 Approvals</h3>
+        <span class="text-[10px] text-amber-400 font-mono">Requires verification</span>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-6 mb-8">
+      <div class="lg:col-span-7 glass p-5 rounded-2xl border-white/5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Rental Volume & Utilization Delta Timeline</h4>
+        <div class="h-44 flex items-end justify-between pt-6 px-4 border-b border-white/10 gap-2 font-mono text-[9px] text-slate-500">
+          <div class="w-full bg-blue-500/20 hover:bg-blue-500/40 transition-colors h-1/4 rounded-t-sm relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-950 text-white p-1 rounded-sm text-[8px]">25%</span></div>
+          <div class="w-full bg-blue-500/20 hover:bg-blue-500/40 transition-colors h-2/5 rounded-t-sm relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-950 text-white p-1 rounded-sm text-[8px]">40%</span></div>
+          <div class="w-full bg-blue-500/20 hover:bg-blue-500/40 transition-colors h-1/2 rounded-t-sm relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-950 text-white p-1 rounded-sm text-[8px]">50%</span></div>
+          <div class="w-full bg-blue-600/60 hover:bg-blue-500/80 transition-colors h-3/4 rounded-t-sm relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-950 text-white p-1 rounded-sm text-[8px]">75%</span></div>
+          <div class="w-full bg-emerald-500/80 hover:bg-emerald-400 transition-colors h-[92%] rounded-t-sm relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-950 text-white p-1 rounded-sm text-[8px]">92%</span></div>
+        </div>
+        <div class="flex justify-between mt-2 text-[10px] text-slate-500 font-mono">
+          <span>Jan 2026</span><span>Feb 2026</span><span>Mar 2026</span><span>Apr 2026</span><span>May 2026</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 glass p-5 rounded-2xl border-white/5 flex flex-col justify-between">
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Live Equipment Asset Control</h4>
+          <p class="text-[11px] text-slate-500 mb-4">Quick modification state matrix fallback simulator for hardware components.</p>
+        </div>
+        <div class="space-y-2 max-h-40 overflow-y-auto pr-1 text-[11px]">
+          <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+            <span class="truncate font-medium text-white max-w-[150px]">Mass Spectrometer X10</span>
+            <div class="flex gap-2">
+              <button class="px-2 py-0.5 rounded bg-blue-600/30 text-blue-400 hover:bg-blue-600/50 transition-colors">Edit</button>
+              <button class="px-2 py-0.5 rounded bg-red-600/30 text-red-400 hover:bg-red-600/50 transition-colors">Delete</button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+            <span class="truncate font-medium text-white max-w-[150px]">Digital Micro-Incubator</span>
+            <div class="flex gap-2">
+              <button class="px-2 py-0.5 rounded bg-blue-600/30 text-blue-400 hover:bg-blue-600/50 transition-colors">Edit</button>
+              <button class="px-2 py-0.5 rounded bg-red-600/30 text-red-400 hover:bg-red-600/50 transition-colors">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-5 rounded-2xl border-white/5">
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Recent Network Bookings Log Ledger</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400 font-mono">
+              <th class="pb-3 font-medium">Asset Reference ID</th>
+              <th class="pb-3 font-medium">Institution / Client</th>
+              <th class="pb-3 font-medium">Lease Terms</th>
+              <th class="pb-3 font-medium">Financial Clearing</th>
+              <th class="pb-3 font-medium">Status Badge</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-slate-300">
+            <tr>
+              <td class="py-3 font-mono text-white">#SLH-8821-M</td>
+              <td class="py-3">Kenyatta University Biotech</td>
+              <td class="py-3">14 Days Tenure</td>
+              <td class="py-3 font-mono text-emerald-400">KES 140,000</td>
+              <td class="py-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]">Active</span></td>
+            </tr>
+            <tr>
+              <td class="py-3 font-mono text-white">#SLH-4091-P</td>
+              <td class="py-3">Avenue Hospital Diagnostics</td>
+              <td class="py-3">30 Days Tenure</td>
+              <td class="py-3 font-mono text-emerald-400">KES 450,000</td>
+              <td class="py-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px]">Transit</span></td>
+            </tr>
+            <tr>
+              <td class="py-3 font-mono text-white">#SLH-1102-S</td>
+              <td class="py-3">Moi University Engineering</td>
+              <td class="py-3">3 Days Tenure</td>
+              <td class="py-3 font-mono text-emerald-400">KES 45,000</td>
+              <td class="py-3"><span class="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 border border-slate-500/30 text-[10px]">Concluded</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+
+<script>
+  // SCHEMA MATRICES FOR THE HARDWARE COMPONENTS & CLASSIFICATIONS
+  const CATEGORIES_DATA = [
+    { name: "Microscopes", icon: "🔬", count: 142, desc: "High-resolution optical, confocal & electronic imaging assets." },
+    { name: "PCR Machines", icon: "🧬", count: 86, desc: "Thermal cyclers for rapid structural nucleotide amplification." },
+    { name: "Spectrophotometers", icon: "🎛️", count: 94, desc: "Quantitative spectrum radiation measurement configurations." },
+    { name: "Centrifuges", icon: "🌀", count: 112, desc: "High-speed centrifugal cell particulate extraction rigs." },
+    { name: "Incubators", icon: "🌡️", count: 73, desc: "Regulated biological cell environmental cultivation spaces." },
+    { name: "Analytical Balances", icon: "⚖️", count: 105, desc: "Ultra-precise metric micro-gram precision balance indicators." },
+    { name: "Water Testing Kits", icon: "🧪", count: 64, desc: "Field-deployable titration & biological impurity assays." },
+    { name: "Medical Equipment", icon: "🏥", count: 164, desc: "High-fidelity diagnostic analyzers for clinical validation modules." }
+  ];
+
+  const MARKETPLACE_DATA = [
+    {
+      id: 1,
+      name: "Olympus BX53 Research Microscope",
+      category: "Microscopes",
+      rate: "KES 8,500",
+      location: "Nairobi County",
+      status: "Available",
+      rating: 4.9,
+      image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=600&auto=format&fit=crop",
+      specs: "Phase contrast capabilities, advanced 100x oil immersion lenses, high-luminescence digital capture array mapping."
+    },
+    {
+      id: 2,
+      name: "Applied Biosystems PCR QuantStudio 5",
+      category: "PCR Machines",
+      rate: "KES 22,000",
+      location: "Kiambu County",
+      status: "Available",
+      rating: 4.8,
+      image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=600&auto=format&fit=crop",
+      specs: "96-well configuration system block, real-time tracking dashboard diagnostics, factory calibration completed Q1 2026."
+    },
+    {
+      id: 3,
+      name: "Shimadzu UV-1900i Spectrophotometer",
+      category: "Spectrophotometers",
+      rate: "KES 14,500",
+      location: "Kisumu County",
+      status: "Reserved Soon",
+      rating: 4.7,
+      image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600&auto=format&fit=crop",
+      specs: "Double-beam spectrophotometric design framework, spectrum scans via high speed processing matrix, USB output modules built-in."
+    },
+    {
+      id: 4,
+      name: "Eppendorf 5425 Benchtop Centrifuge",
+      category: "Centrifuges",
+      rate: "KES 6,200",
+      location: "Uasin Gishu County",
+      status: "Available",
+      rating: 4.9,
+      image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=600&auto=format&fit=crop",
+      specs: "Aerosol-tight rotor design configuration, 24-place layout for standard tubes, whisper quiet operational cycle matrices."
+    },
+    {
+      id: 5,
+      name: "Memmert IN30 Cultivation Incubator",
+      category: "Incubators",
+      rate: "KES 7,800",
+      location: "Nakuru County",
+      status: "Available",
+      rating: 4.6,
+      image: "https://images.unsplash.com/photo-1581092918056-0c4c3dad3785?q=80&w=600&auto=format&fit=crop",
+      specs: "Natural convection atmospheric control, stainless steel interiors, range from +20°C to +80°C parameters precisely checked."
+    },
+    {
+      id: 6,
+      name: "Mettler Toledo Precision Balance",
+      category: "Analytical Balances",
+      rate: "KES 4,500",
+      location: "Mombasa County",
+      status: "Available",
+      rating: 5.0,
+      image: "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=600&auto=format&fit=crop",
+      specs: "0.1 milligram absolute determination ceiling, protective drafting shield structure, automatic internal adjustments engine."
+    }
+  ];
+
+  let selectedAssetId = null;
+
+  // DOM INJECTION SCHEDULER
+  document.addEventListener("DOMContentLoaded", () => {
+    renderCategories();
+    renderMarketplace();
+    initAnimatedCounters();
+
+    // Track scroll events to change nav opacity
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('main-nav');
+      if (window.scrollY > 50) {
+        nav.classList.add('bg-[#0F172A]/95', 'shadow-xl');
+      } else {
+        nav.classList.remove('bg-[#0F172A]/95', 'shadow-xl');
+      }
+    });
+  });
+
+  function renderCategories() {
+    const container = document.getElementById("categories-container");
+    container.innerHTML = CATEGORIES_DATA.map(cat => `
+      <div class="glass p-6 rounded-2xl border-white/5 hover:border-blue-500/30 hover:bg-white/[0.02] transform hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-105 transition-transform">
+            ${cat.icon}
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">${cat.name}</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">${cat.desc}</p>
+        </div>
+        <span class="text-[11px] font-mono font-semibold text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded w-max">
+          ${cat.count} Active Units
+        </span>
+      </div>
+    `).join('');
+  }
+
+  function renderMarketplace() {
+    const grid = document.getElementById("marketplace-grid");
+    grid.innerHTML = MARKETPLACE_DATA.map(item => `
+      <div class="glass rounded-2xl overflow-hidden border-white/5 group hover:border-white/10 transition-all flex flex-col justify-between">
+        <div class="relative overflow-hidden h-52 bg-slate-950">
+          <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <span class="absolute top-4 right-4 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase backdrop-blur-md ${item.status === 'Available' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+            ${item.status}
+          </span>
+          <span class="absolute bottom-4 left-4 glass px-2 py-0.5 rounded text-[10px] font-mono text-slate-300">
+            📍 ${item.location}
+          </span>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+              <span class="font-medium text-blue-400">${item.category}</span>
+              <span class="font-mono text-yellow-400">★ ${item.rating.toFixed(1)}</span>
+            </div>
+            <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition-colors truncate mb-2">${item.name}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">${item.specs}</p>
+          </div>
+
+          <div class="pt-4 border-t border-white/5 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] uppercase text-slate-500 font-mono tracking-wider">Daily Rate</p>
+              <p class="text-base font-extrabold text-white font-mono">${item.rate}</p>
+            </div>
+            <button onclick="openBookingModal(${item.id})" class="px-4 py-2 rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-500 transition-all shadow-md hover:shadow-blue-600/20">
+              Rent Now
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // DYNAMIC COUNTERS ANIMATION ENGINE
+  function initAnimatedCounters() {
+    const counters = [
+      { id: 'count-equipment', suffix: '+' },
+      { id: 'count-rentals', suffix: '+' },
+      { id: 'count-institutions', suffix: '' },
+      { id: 'count-counties', suffix: '/47' }
+    ];
+
+    counters.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (!el) return;
+      const target = parseInt(el.getAttribute('data-target'));
+      let current = 0;
+      const duration = 2000; 
+      const stepTime = Math.max(Math.floor(duration / target), 15);
+      
+      const timer = setInterval(() => {
+        current += Math.ceil(target / 100);
+        if (current >= target) {
+          el.innerText = target + c.suffix;
+          clearInterval(timer);
+        } else {
+          el.innerText = current + c.suffix;
+        }
+      }, stepTime);
+    });
+  }
+
+  // USER ROLE SELECTION LOGIC FALLBACK
+  function setUIRole(roleName) {
+    // Update active visual status on filters
+    const btns = document.querySelectorAll('.role-btn');
+    btns.forEach(b => {
+      if (b.innerText === roleName) {
+        b.classList.add('bg-blue-600', 'text-white');
+        b.classList.remove('hover:bg-white/5', 'text-slate-400');
+      } else {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('hover:bg-white/5', 'text-slate-400');
+      }
+    });
+
+    document.getElementById('active-role-badge').innerText = `Role: ${roleName}`;
+    alert(`UI Workspace context dynamically swapped to: [${roleName} Perspective]`);
+  }
+
+  // BOOKING MODAL AND STEPS EXECUTION FLOW
+  function openBookingModal(itemId) {
+    const item = MARKETPLACE_DATA.find(x => x.id === itemId) || MARKETPLACE_DATA[0];
+    selectedAssetId = item.id;
+    
+    const container = document.getElementById("modal-content-grid");
+    container.innerHTML = `
+      <div class="md:col-span-6">
+        <img src="${item.image}" alt="${item.name}" class="rounded-2xl w-full h-60 object-cover border border-white/10 mb-4" />
+        <h3 class="text-xl font-bold text-white mb-2">${item.name}</h3>
+        <p class="text-xs text-blue-400 font-medium mb-4">${item.category} Matrix</p>
+        
+        <div class="space-y-3 text-xs bg-slate-900/60 p-4 rounded-xl border border-white/5">
+          <p class="text-slate-300 leading-relaxed"><strong class="text-white">Technical Specs:</strong> ${item.specs}</p>
+          <p class="text-slate-400 font-mono">📍 Region Node: ${item.location} Node</p>
+        </div>
+      </div>
+
+      <div class="md:col-span-6 flex flex-col justify-between" id="wizard-form-area">
+        <div>
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Step 1: Verify Engineering Calibration</h4>
+          <div class="space-y-3 text-xs">
+            <label class="block p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10">
+              <input type="radio" name="calibration-confirm" checked class="mr-2 accent-blue-500"> Accept baseline operational state certification
+            </label>
+            <p class="text-[11px] text-slate-500">Platform base escrow processing fees apply at verification completion protocols.</p>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/5 flex items-center justify-between mt-6">
+          <div>
+            <span class="text-[10px] font-mono text-slate-500 block">BASE LEASE RATE</span>
+            <span class="text-lg font-bold text-emerald-400 font-mono">${item.rate}/day</span>
+          </div>
+          <button onclick="advanceWizardStep(2)" class="px-5 py-2.5 rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-500 transition-all">
+            Continue Workflow
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("booking-modal").classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+  }
+
+  function advanceWizardStep(stepNumber) {
+    const wizardArea = document.getElementById("wizard-form-area");
+    
+    // Reset indicators
+    document.getElementById("step-indicator-1").className = stepNumber === 1 ? "text-blue-500 border-b-2 border-blue-500 pb-1" : "text-slate-500";
+    document.getElementById("step-indicator-2").className = stepNumber === 2 ? "text-blue-500 border-b-2 border-blue-500 pb-1" : "text-slate-500";
+    document.getElementById("step-indicator-3").className = stepNumber === 3 ? "text-blue-500 border-b-2 border-blue-500 pb-1" : "text-slate-500";
+
+    if (stepNumber === 2) {
+      wizardArea.innerHTML = `
+        <div>
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Step 2: Scheduling & Logistics</h4>
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1.5 font-medium">Select Tenure Calendar Windows</label>
+              <input type="date" class="w-full bg-slate-900 border border-white/10 p-2.5 rounded-xl text-white focus:outline-none focus:border-blue-500" value="2026-06-15" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1.5 font-medium">Insured Transit Matrix Options</label>
+              <select class="w-full bg-slate-900 border border-white/10 p-2.5 rounded-xl text-white focus:outline-none focus:border-blue-500">
+                <option>Standard Secure Logistics Courier (Kargo Node)</option>
+                <option>Climate Stabilized Cold-Chain Protocol Node (+ KES 15,000)</option>
+                <option>Institutional Self-Pickup Certified Escort</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/5 flex items-center justify-between mt-6">
+          <button onclick="advanceWizardStep(1)" class="text-xs font-semibold text-slate-400 hover:text-white">Back</button>
+          <button onclick="advanceWizardStep(3)" class="px-5 py-2.5 rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-500 transition-all">
+            Proceed to Payment
+          </button>
+        </div>
+      `;
+    } else if (stepNumber === 3) {
+      wizardArea.innerHTML = `
+        <div>
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Step 3: Escrow Allocation Clearing</h4>
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-xs mb-4">
+            <div class="flex justify-between mb-2"><span>Hardware Tenancy Tenures base:</span><span class="font-mono text-white">Verified</span></div>
+            <div class="flex justify-between mb-2"><span>Sovereign Transit Insurance:</span><span class="font-mono text-white">Included</span></div>
+            <div class="flex justify-between pt-2 border-t border-white/5 font-bold text-emerald-400"><span>Total Clearing Hold:</span><span>Escrow Ready</span></div>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">Funds are dynamically locked within our secure Kenyan hub platform loop until equipment operational compliance checks validate successfully at destination node parameters.</p>
+        </div>
+
+        <div class="pt-6 border-t border-white/5 flex items-center justify-between mt-6">
+          <button onclick="advanceWizardStep(2)" class="text-xs font-semibold text-slate-400 hover:text-white">Back</button>
+          <button onclick="finalizeBooking()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-600 text-xs font-bold text-white hover:opacity-95 transition-all shadow-lg">
+            Authorize Rental Request
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function finalizeBooking() {
+    alert("Operational Token Issued! Rental request has been dynamically dispatched into the backend server stack pipeline securely.");
+    closeBookingModal();
+  }
+
+  function closeBookingModal() {
+    document.getElementById("booking-modal").classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  // SAAS INTERACTIVE VIEW DRAWER SWITCH ENGINE
+  function toggleDashboardView() {
+    const dash = document.getElementById("dashboard-demo-overlay");
+    dash.classList.toggle("hidden");
+  }
+</script>
 
 </body>
 </html>

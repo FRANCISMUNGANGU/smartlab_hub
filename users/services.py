@@ -23,7 +23,7 @@ class UserService:
             for admin in admins:
                 NotificationLog.objects.create(
                     user=admin,
-                    alert_type="SYSTEM",
+                    notification_type="SYSTEM",
                     message=f"New Vendor Registration: {user.username} from {user.organization}. Verification required."
                 )
         else:
@@ -31,7 +31,7 @@ class UserService:
 
         NotificationLog.objects.create(
             user=user,
-            alert_type="INFO",
+            notification_type="INFO",
             message=welcome_message
         )
 
@@ -50,7 +50,7 @@ class UserService:
         # Notify the user about their role change
         NotificationLog.objects.create(
             user=user,
-            alert_type="ROLE_CHANGE",
+            notification_type="ROLE_CHANGE",
             message=f"Your role has been updated from {old_role} to {new_role}."
         )
 

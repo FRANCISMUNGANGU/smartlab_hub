@@ -46,14 +46,14 @@ class TransactionService:
         # 3. Notify Vendor
         NotificationLog.objects.create(
             user=booking.unit.equipment.vendor,
-            alert_type="PAYMENT",
+            notification_type="PAYMENT",
             message=f"Payment confirmed for {booking.unit.equipment.name}. Prepare for pickup."
         )
 
         # 4. Notify Student about next steps (pickup instructions, etc.)
         NotificationLog.objects.create(
             user=booking.user,
-            alert_type="INFO",
+            notification_type="INFO",
             message=f"Your payment for {booking.unit.equipment.name} has been confirmed. Please check your booking details for pickup instructions."
         )
 

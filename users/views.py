@@ -10,7 +10,8 @@ from rest_framework.permissions import IsAdminUser
 
 class UserRegistrationViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    
+    permission_classes = [permissions.AllowAny]
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -53,7 +54,7 @@ class VendorApprovalView(APIView):
             # Notify the vendor they are live
             NotificationLog.objects.create(
                 user=vendor,
-                alert_type="INFO",
+                notification_type="INFO",
                 message="Your Vendor account has been verified. You can now list equipment."
             )
             
