@@ -15,9 +15,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.http import JsonResponse
-from django.urls import path
-from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -33,15 +30,6 @@ from .frontend_views import (
     VendorDashboardView, VendorEquipmentView, VendorInventoryView,
     VendorBookingsView, AdminDashboardView,
 )
-
-def root_health_check(request):
-    return JsonResponse({
-        "status": "online",
-        "service": "SmartLab Hub API",
-        "timestamp": "2026-04-15",
-        "documentation": "See /admin/ for data management"
-    })
-
 
 
 urlpatterns = [
@@ -80,11 +68,17 @@ urlpatterns = [
     
     # 5. Feedback & Incident Reports
     path('api/feedback/', include('feedback.urls')),
-
+    
+    # 6. Alerts & Notifications
+    path('api/alerts/', include('alerts.urls')),
+    
+    # 7. Transactions & Payment History
+    path('api/transactions/', include('transactions.urls')),
+    
+    # 8. Payments
     path('api/payments/', include('payment.urls')),
 
-
-    # 6. Specialized Analysis & Webhooks (The "Global" endpoints)
+    # 9. Specialized Analysis & Webhooks (The "Global" endpoints)
     path('api/analysis/dashboard/', AdminDashboardAnalysisView.as_view(), name='admin-analysis'),
     path('api/payments/callback/', PaystackWebhookView.as_view(), name='payment-callback'),
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

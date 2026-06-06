@@ -348,19 +348,26 @@ function calcPrice() {
 async function submitBooking() {
   const unitId = document.getElementById('unit-select').value;
   if (!unitId) { Toast.error('Please select an available unit.'); return; }
-
-  const data = {
+   const data = {
     unit: unitId,
     booking_type: bookingType,
-    start_date: document.getElementById('modal-start-date').value,
-    end_date: document.getElementById('modal-end-date').value,
     pick_up_location: document.getElementById('modal-pickup').value,
     drop_off_location: document.getElementById('modal-dropoff').value,
   };
 
-  if (bookingType === 'RENTAL' && (!data.start_date || !data.end_date)) {
-    Toast.error('Please select rental dates.');
-    return;
+  if(bookingType === 'RENTAL') {
+    const start = document.getElementById('modal-start-date').value;
+    const end = document.getElementById('modal-end-date').value;
+    if (!start || !end) {
+      Toast.error('Please select rental dates.');
+      return;
+    }
+    data.start_date = start;
+    data.end_date = end;
+  } else {
+    // Only set to null if it's NOT a rental type
+    data.start_date = null; 
+    data.end_date = null; 
   }
 
   const btn = event.target;
@@ -370,17 +377,46 @@ async function submitBooking() {
     const result = await API.bookings.create(data);
     if (result.checkout_url) {
       Toast.success('Booking created! Redirecting to payment…');
+      // Redirects to Paystack
       setTimeout(() => window.location.href = result.checkout_url, 1200);
     } else {
       Toast.success('Booking submitted!');
       closeModal('booking-modal');
     }
   } catch (err) {
-    const msg = err.data?.error || err.data?.detail || 'Booking failed. Please try again.';
+    const errorData = err.response?.data || err.data;
+    let msg = 'Booking failed. Please try again.';
+
+    if (errorData && typeof errorData === 'object') {
+        msg = Object.entries(errorData)
+            .map(([field, errors]) => {
+                const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
+                const fieldErrors = Array.isArray(errors) ? errors.join(' ') : errors;
+                return `${fieldName}: ${fieldErrors}`;
+            })
+            .join('\n');
+    } else if (typeof errorData === 'string') {
+        msg = errorData;
+    }
     Toast.error(msg);
   } finally {
     btn.textContent = '💳 Proceed to Payment'; btn.disabled = false;
   }
 }
+
+// --- PAYSTACK REDIRECT HANDLING ---
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const reference = urlParams.get('reference');
+
+    if (status === 'success') {
+        Toast.success(`🎉 Booking Confirmed! Payment successful. Ref: ${reference}`);
+        
+        // Clean URL parameter history strings
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+});
 </script>
 {% endblock %}

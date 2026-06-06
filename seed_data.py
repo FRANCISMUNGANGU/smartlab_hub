@@ -81,6 +81,7 @@ def seed():
             'category': 'Microscopy',
             'description': 'Advanced compound microscope with 40x-1000x magnification. Ideal for cell biology, microbiology, and histology studies.',
             'rental_price_per_day': 1500, 'purchase_price': 185000,
+            'image': 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=500&h=500&fit=crop',
             'serials': ['OLY-CX23-001', 'OLY-CX23-002'],
         },
         {
@@ -89,6 +90,7 @@ def seed():
             'category': 'Microscopy',
             'description': 'High-performance fluorescence microscope with LED illumination. Suitable for immunofluorescence and live cell imaging.',
             'rental_price_per_day': 4500, 'purchase_price': 850000,
+            'image': 'https://images.unsplash.com/photo-1576091160550-112173fba4ee?w=500&h=500&fit=crop',
             'serials': ['ZSS-PS-001'],
         },
         {
@@ -97,6 +99,7 @@ def seed():
             'category': 'Centrifugation',
             'description': 'Refrigerated microcentrifuge reaching up to 21,382 × g. Perfect for molecular biology and biochemistry applications.',
             'rental_price_per_day': 2000, 'purchase_price': 320000,
+            'image': 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=500&h=500&fit=crop',
             'serials': ['EPP-5424-001', 'EPP-5424-002', 'EPP-5424-003'],
         },
         {
@@ -105,6 +108,7 @@ def seed():
             'category': 'Spectroscopy',
             'description': 'Double-beam UV-Vis spectrophotometer with wavelength range 190-1100 nm. For quantitative and qualitative analysis.',
             'rental_price_per_day': 3500, 'purchase_price': 650000,
+            'image': 'https://images.unsplash.com/photo-1581092162562-40038f56386f?w=500&h=500&fit=crop',
             'serials': ['SHM-UV1900-001'],
         },
         {
@@ -113,6 +117,7 @@ def seed():
             'category': 'Weighing',
             'description': 'High-precision analytical balance with 220g capacity and 0.1mg readability. GxP compliant.',
             'rental_price_per_day': 800, 'purchase_price': 95000,
+            'image': 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&h=500&fit=crop',
             'serials': ['MT-ME204-001', 'MT-ME204-002'],
         },
         {
@@ -121,6 +126,7 @@ def seed():
             'category': 'Temperature Control',
             'description': 'Direct heat CO2 incubator with HEPA filtration. Essential for mammalian cell culture work.',
             'rental_price_per_day': 5500, 'purchase_price': 1200000,
+            'image': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=500&fit=crop',
             'serials': ['TF-VIOS-001'],
         },
         {
@@ -129,6 +135,7 @@ def seed():
             'category': 'Electrophoresis',
             'description': 'Horizontal gel electrophoresis system for DNA/RNA analysis. Includes power supply and gel casting tray.',
             'rental_price_per_day': 1200, 'purchase_price': 85000,
+            'image': 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=500&h=500&fit=crop',
             'serials': ['BR-PPB-001', 'BR-PPB-002'],
         },
     ]

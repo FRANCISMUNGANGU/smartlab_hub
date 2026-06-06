@@ -15,18 +15,20 @@ class EquipmentUnitStatusSerializer(serializers.ModelSerializer):
 
 class EquipmentSerializer(serializers.ModelSerializer):
     # Nested Serializers for better Readability
+    category = CategorySerializer(read_only=True)
     category_name = serializers.ReadOnlyField(source='category.name')
     vendor_name = serializers.ReadOnlyField(source='vendor.username')
     
     # This allows the frontend to see if ANY units are available without extra API calls
     availability_count = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Equipment
         fields = [
             'id', 'name', 'brand', 'model_number', 'description', 
-            'category_name', 'vendor_name', 'rental_price_per_day', 
-            'purchase_price', 'availability_count', 'image'
+            'category', 'category_name', 'vendor_name', 'rental_price_per_day', 
+            'purchase_price', 'availability_count', 'image', 'created_at'
         ]
 
     def get_availability_count(self, obj):

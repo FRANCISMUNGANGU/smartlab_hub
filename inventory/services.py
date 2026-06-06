@@ -1,8 +1,9 @@
-from datetime import date
+from datetime import date, timezone
 from django.db import transaction
 from django.db.models import Q
 from .models import EquipmentUnit, MaintenanceLog
 from feedback.services import FeedbackService
+import datetime, time
 
 class InventoryService:
     
@@ -16,16 +17,22 @@ class InventoryService:
             equipment_id=equipment_id,
             status=EquipmentUnit.Status.AVAILABLE
         )
+        start_datetime = datetime.combine(start_date, time.min)
+        end_datetime = datetime.combine(end_date, time.max)
+
+        aware_start_date = timezone.make_aware(start_datetime, timezone.get_current_timezone())
+        aware_end_date = timezone.make_aware(end_datetime, timezone.get_current_timezone())
+
 
         for unit in candidates:
             # Check for overlapping bookings
             has_booking = unit.bookings.filter(
-                Q(start_date__lte=end_date) & Q(end_date__gte=start_date)
+                Q(start_date__lte=aware_end_date) & Q(end_date__gte=aware_start_date)
             ).exists()
 
             # Check for planned maintenance/calibration
             has_maintenance = unit.maintenance_history.filter(
-                Q(start_date__lte=end_date) & Q(end_date__gte=start_date) & Q(is_completed=False)
+                Q(start_date__lte=aware_end_date) & Q(end_date__gte=aware_start_date) & Q(is_completed=False)
             ).exists()
 
             if not has_booking and not has_maintenance:
@@ -73,3 +80,12 @@ class InventoryService:
             )
         
         return student
+    
+    def update_unit_status(self, unit_id, new_status):
+        """
+        Admin function to manually update the status of an equipment unit.
+        """
+        unit = EquipmentUnit.objects.get(id=unit_id)
+        unit.status = new_status
+        unit.save()
+        return unit

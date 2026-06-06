@@ -23,7 +23,7 @@ class PaymentService:
             "email": transaction.booking.user.email,
             "amount": int(transaction.amount * 100), # Paystack uses Cents/Kobo
             "reference": transaction.transaction_reference,       # YOUR generated ID
-            "callback_url": "https://fbd3-102-205-238-255.ngrok-free.app/api/payments/callback/",
+            "callback_url": f"{settings.NGROK_URL}/api/payments/callback/",
         }
 
         response = requests.post(url, json=payload, headers=headers)
@@ -65,7 +65,7 @@ class PaymentService:
         with db_transaction.atomic():
             # select_for_update() locks the row so two webhooks don't clash
             txn = Transaction.objects.select_for_update().get(id=transaction_id)
-            
+
             if txn.status == Transaction.PaymentStatus.COMPLETED:
                 return  # Already processed
 
@@ -74,5 +74,8 @@ class PaymentService:
 
             # Reach through the OneToOne to the Booking
             booking = txn.booking
+            inventory_unit = booking.unit
+            inventory_unit.status = 'RENTED' if booking.booking_type == 'RENTAL' else 'SOLD'
+            inventory_unit.save()
             booking.status = 'CONFIRMED'
             booking.save()

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Feedback, IncidentReport
+from inventory.serializers import EquipmentUnitSerializer
+from users.serializers import UserSerializer
 
 class IncidentReportSerializer(serializers.ModelSerializer):
     # Helpful read-only fields for the frontend
@@ -18,6 +20,13 @@ class IncidentReportSerializer(serializers.ModelSerializer):
         # because the system should handle these automatically.
         read_only_fields = ['id', 'reporter', 'reported_at']
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['equipment_unit'] = EquipmentUnitSerializer(instance.equipment_unit).data
+        data['reporter'] = UserSerializer(instance.reporter).data
+        data['target_user'] = UserSerializer(instance.target_user).data
+        return data
+
     def validate(self, data):
         # Prevent reporting yourself
         if self.context['request'].user == data.get('target_user'):
@@ -26,10 +35,17 @@ class IncidentReportSerializer(serializers.ModelSerializer):
     
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Feedback
         fields = ['id', 'user', 'equipment_unit', 'rating', 'comment', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['equipment_unit'] = EquipmentUnitSerializer(instance.equipment_unit).data
+        data['user'] = UserSerializer(instance.user).data
+        return data
 
     def validate_rating(self, value):
         if value < 1 or value > 5:

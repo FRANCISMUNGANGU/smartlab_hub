@@ -19,8 +19,8 @@ class Booking(models.Model):
     unit = models.ForeignKey('inventory.EquipmentUnit', on_delete=models.CASCADE, related_name='bookings')
     booking_type = models.CharField(max_length=20, choices=BookingType.choices)
     status = models.CharField(max_length=20, choices=BookingStatus.choices, default=BookingStatus.PENDING)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     pick_up_location = models.CharField(max_length=255, blank=True, null=True)

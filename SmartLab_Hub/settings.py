@@ -1,11 +1,20 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from environ import Env # pip install django-environ
+
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = Env()
+Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'smartlab-dev-secret-key-change-in-production')
-PAYMENT_SECRET = os.getenv('PAYMENT_SECRET', 'dev-payment-secret')
-PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY', 'dev-paystack-key')
+# 3. USE THE env() FUNCTION INSTANCE INSTEAD OF os.getenv
+SECRET_KEY = env('DJANGO_SECRET_KEY')  # SimpleJWT will see this now!
+PAYMENT_SECRET = env('PAYMENT_SECRET', default=None)
+PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')
+NGROK_URL = env('NGROK_URL')
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]

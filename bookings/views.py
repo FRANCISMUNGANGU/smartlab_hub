@@ -14,8 +14,9 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+        if not serializer.is_valid():
+            print(serializer.errors)  # Debugging line to print validation errors
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:
             booking = BookingService.create_lab_booking(
                 user=request.user,
@@ -39,9 +40,12 @@ class BookingViewSet(viewsets.ModelViewSet):
                     "booking data": output_serializer.data
                 }, status=201)
             
+            print(paystack_data)  # Debugging line to print Paystack response
+            
             return Response({"error": "Payment initialization failed"}, status=400)
             
         except ValueError as e:
+            print(str(e))  # Debugging line to print the error message
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     def get_queryset(self):
@@ -49,6 +53,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         if user.is_authenticated:
             if user.role == 'VENDOR':
                 return Booking.objects.filter(unit__equipment__vendor=user)
-            return Booking.objects.filter(user=user)
+            return Booking.objects.filter(user=user).order_by('-created_at')
         return Booking.objects.none()
     

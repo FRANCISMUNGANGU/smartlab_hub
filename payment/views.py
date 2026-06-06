@@ -7,6 +7,8 @@ from .services import PaymentService
 from .signals import payment_confirmed
 from transactions.models import Transaction
 import logging
+from django.shortcuts import redirect
+from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +62,7 @@ class PaystackCallbackView(APIView):
 
     def get(self, request):
         reference = request.query_params.get('reference')
-
-        return Response({
-            "message": "Payment received. Awaiting confirmation.",
-            "reference": reference
-        })
+        frontend_url = f"http://localhost/bookings?status=success&reference={reference}"
+    
+        return redirect(frontend_url)
+       

@@ -10,8 +10,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = [
             'id', 'booking_id', 'equipment_name', 'amount', 
-            'status', 'transaction_type', 'provider_reference', 'created_at'
+            'status', 'transaction_reference', 'created_at'
         ]
         # We make status and provider_ref read-only so the student 
         # can't manually tell the API "I have paid"
-        read_only_fields = ['status', 'amount', 'provider_reference', 'created_at']
+        read_only_fields = ['status', 'amount', 'transaction_reference', 'created_at']

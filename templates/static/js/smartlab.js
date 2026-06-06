@@ -55,7 +55,11 @@ const API = (() => {
         if (!res.ok) throw { status: res.status, data: json };
         return json;
       }
-      return await res.text();
+      
+      // Handle non-JSON responses
+      const text = await res.text();
+      if (!res.ok) throw { status: res.status, data: { detail: text || `HTTP ${res.status}` } };
+      return text;
     } catch (err) {
       if (err.status) throw err;
       throw { status: 0, data: { detail: 'Network error. Is the server running?' } };
@@ -433,7 +437,25 @@ async function doRegister() {
     Toast.success('Registration successful! Please sign in.');
     switchTab('login');
   } catch (err) {
-    const message = err?.data?.detail || 'Registration failed. Please try again.';
+    const errorData = err.response?.data || err.data;
+    
+    let message = 'Registration failed. Please try again.';
+
+    // 2. Parse Django's field-specific errors if they exist
+    if (errorData && typeof errorData === 'object') {
+        // If Django sent a specific error message string array
+        message = Object.entries(errorData)
+            .map(([field, errors]) => {
+                // Capitalize field name and join errors (e.g., "Email: This field is required.")
+                const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
+                const fieldErrors = Array.isArray(errors) ? errors.join(' ') : errors;
+                return `${fieldName}: ${fieldErrors}`;
+            })
+            .join('\n'); // Separates multiple field errors with a new line
+    } else if (typeof errorData === 'string') {
+        message = errorData;
+    }
+
     if (errEl) {
       errEl.textContent = message;
       errEl.classList.remove('hidden');
@@ -441,7 +463,7 @@ async function doRegister() {
       Toast.error(message);
     }
   }
-}
+}  
 
 // Export for global use
 window.API = API;

@@ -12,7 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'first_name', 'last_name', 'role', 'phone', 'organization', 'profile_picture']
+        fields = [
+            'id', 'username', 'email', 'password', 'first_name', 'last_name',
+            'role', 'phone', 'organization', 'pickup_location', 'dropoff_location',
+            'profile_picture', 'is_active', 'date_joined'
+        ]
+        read_only_fields = ['date_joined', 'is_active']
         extra_kwargs = {
             'username': {'required': True},
             'email': {'required': True},

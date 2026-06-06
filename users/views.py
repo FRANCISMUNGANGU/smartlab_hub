@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from transactions import serializer
 from .serializers import UserSerializer
 from .models import User
 from .services import UserService
@@ -8,16 +11,25 @@ from alerts.models import NotificationLog
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 
+
+User = get_user_model()
+
+
 class UserRegistrationViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.none()  # Placeholder to avoid errors in the service layer
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  # Allow anyone to register
+    http_method_names = ['post']  
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # CALL THE SERVICE
         user = UserService.register_user(serializer.validated_data)
+        if not user:
+            return Response({"error": "User registration failed"}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({
             "message": "User registered successfully",

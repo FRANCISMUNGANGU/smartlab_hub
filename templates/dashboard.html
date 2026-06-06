@@ -13,6 +13,12 @@
   }
 </style>
 
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
 <div class="max-w-screen-2xl mx-auto px-1 py-2">
 
   <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-outline-variant/20">

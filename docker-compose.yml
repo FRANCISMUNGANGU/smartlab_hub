@@ -6,6 +6,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      - django_static:/app/staticfiles
+
     expose:
       - "8000"
     env_file:
@@ -42,6 +44,8 @@ services:
   nginx:
     build: ./nginx
     container_name: smartlab_nginx
+    volumes:
+      - django_static:/app/staticfiles
     ports:
       - "80:80"
     depends_on:
@@ -51,9 +55,9 @@ services:
 
   ngrok:
     image: ngrok/ngrok:latest
-    container_name: smartlap_ngrok
+    container_name: smartlab_ngrok
     restart: unless-stopped
-    command: http nginx:80
+    command: http nginx:80 --url=${NGROK_URL}
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
       - "4040:4040"
@@ -64,9 +68,12 @@ services:
 
 networks:
   smartlab_network:
+    external: true
     driver: bridge
+
+
 
 
 volumes:
   postgres_data:
-
+  django_static:
